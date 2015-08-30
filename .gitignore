@@ -1,0 +1,4 @@
+*.swp
+.fscache
+*Makefile
+*.mk
