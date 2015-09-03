@@ -5,6 +5,7 @@
 #include <sstream>      // for std::istringstream
 #include <string>
 #include "world.h"
+#include "viewport.h"
 
 static uint32_t g_last_ticks = 0;
 static int g_fps = 0;
@@ -67,19 +68,20 @@ void World::update(uint32_t elapsed)
     m_lifeform->update(elapsed);
 }
 
-void World::render()
+void World::render(const Viewport &viewport)
 {
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    int offset_x = 7, offset_y = -60;
+    SDL_Rect vrect = viewport.get_rect();
+    int offset_x = vrect.x, offset_y = vrect.y;
 
-    for (int i = 0; i < 640/16; i++) {
+    for (int i = 0; i < vrect.w/16; i++) {
         int tile_x_pos = i + offset_x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j < 480/16; j++) {
+        for (int j = 0; j < vrect.h/16; j++) {
             int tile_y_pos = j + offset_y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;

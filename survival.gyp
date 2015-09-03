@@ -15,7 +15,9 @@
                 'src/lifeform.cpp',
                 'src/lifeform.h',
                 'src/terrain.cpp',
-                'src/terrain.h'
+                'src/terrain.h',
+                'src/viewport.cpp',
+                'src/viewport.h',
             ],
             'cflags': [
                 '<!@(<(pkg-config) --cflags sdl2)',

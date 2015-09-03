@@ -8,13 +8,15 @@
 #define WORLD_WIDTH 50
 #define WORLD_HEIGHT 50
 
+class Viewport;
+
 class World
 {
 public:
     World(std::shared_ptr<SDL_Renderer> renderer);
 
     void update(uint32_t elapsed);
-    void render();
+    void render(const Viewport &viewport);
 
 private:
     std::shared_ptr<SDL_Renderer> m_renderer;
