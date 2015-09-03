@@ -76,12 +76,12 @@ void World::render(const Viewport &viewport)
     SDL_Rect vrect = viewport.get_rect();
     int offset_x = vrect.x, offset_y = vrect.y;
 
-    for (int i = 0; i < vrect.w/16; i++) {
+    for (int i = 0; i <= vrect.w/16; i++) {
         int tile_x_pos = i + offset_x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j < vrect.h/16; j++) {
+        for (int j = 0; j <= vrect.h/16; j++) {
             int tile_y_pos = j + offset_y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;
