@@ -60,8 +60,15 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
         }
         row++;
     }
+}
 
-    // Initialize renderer
+void World::update(uint32_t elapsed)
+{
+    m_lifeform->update(elapsed);
+}
+
+void World::render()
+{
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
@@ -82,15 +89,6 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
                            nullptr, &rect);
         }
     }
-}
-
-void World::update(uint32_t elapsed)
-{
-    m_lifeform->update(elapsed);
-}
-
-void World::render()
-{
     m_lifeform->render(m_renderer.get());
     SDL_RenderPresent(m_renderer.get());
 
