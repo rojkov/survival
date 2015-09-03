@@ -31,7 +31,7 @@ int App::execute()
     }
 
     m_renderer.reset(SDL_CreateRenderer(m_win.get(), -1,
-                                        SDL_RENDERER_ACCELERATED),
+                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC),
                      SDL_DestroyRenderer);
     if (m_renderer == nullptr) {
         return -1;
@@ -56,12 +56,6 @@ int App::execute()
 
         world.update(elapsed);
         world.render();
-        int32_t delay = current + MS_PER_FRAME - SDL_GetTicks();
-        if (delay > 0) {
-            SDL_Delay(delay);
-        } else {
-            SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "Oops, can't keep up with rendering");
-        }
     }
 
     return 0;
