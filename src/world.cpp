@@ -1,7 +1,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <assert.h>
-#include <iostream>     // for std::cout
 #include <fstream>      // for std::ifstream
 #include <sstream>      // for std::istringstream
 #include <string>
@@ -66,14 +65,19 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    int offset_x = 7, offset_y = 320;
+    int offset_x = 7, offset_y = -60;
 
     for (int i = 0; i < 640/16; i++) {
+        int tile_x_pos = i + offset_x/16;
+        if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
+            continue;
+        }
         for (int j = 0; j < 480/16; j++) {
-            SDL_Rect rect {i * 16 - (offset_x % 16), j * 16 - (offset_y % 16), 16, 16};
-            int tile_x_pos = i + offset_x/16;
             int tile_y_pos = j + offset_y/16;
-            std::cout << tile_x_pos << " " << tile_y_pos << " " << (tile_y_pos * WORLD_HEIGHT + tile_x_pos) << std::endl;
+            if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
+                continue;
+            }
+            SDL_Rect rect {i * 16 - (offset_x % 16), j * 16 - (offset_y % 16), 16, 16};
             SDL_RenderCopy(m_renderer.get(), m_tiles.at(tile_y_pos * WORLD_HEIGHT + tile_x_pos)->get_texture(),
                            nullptr, &rect);
         }
