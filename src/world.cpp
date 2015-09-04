@@ -17,7 +17,9 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     , m_lifeform(new LifeForm(50, 50))
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
+    , m_texture(nullptr, SDL_DestroyTexture)
 {
+    m_txt_rect = {0, 0, 640+4*16, 480+4*16};
     unique_surf temp_surf(IMG_Load("tileset.png"), SDL_FreeSurface);
     assert(temp_surf != nullptr);
     unique_surf grass_surf(SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0),
@@ -61,6 +63,14 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
         }
         row++;
     }
+
+    // Create world texture
+    m_texture.reset(SDL_CreateTexture(m_renderer.get(), SDL_PIXELFORMAT_RGBA8888,
+                                      SDL_TEXTUREACCESS_TARGET,
+                                      m_txt_rect.w, m_txt_rect.h));
+    assert(m_texture != nullptr);
+    SDL_Rect iv {0, 0, 640, 480};
+    refresh_texture(iv);
 }
 
 void World::update(uint32_t elapsed)
@@ -68,20 +78,32 @@ void World::update(uint32_t elapsed)
     m_lifeform->update(elapsed);
 }
 
-void World::render(const Viewport &viewport)
+void World::refresh_texture(const SDL_Rect &viewport)
 {
+    SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", viewport.x, viewport.y, viewport.w, viewport.h, m_txt_rect.x, m_txt_rect.y, m_txt_rect.w, m_txt_rect.h);
+    SDL_SetRenderTarget(m_renderer.get(), m_texture.get());
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    SDL_Rect vrect = viewport.get_rect();
-    int offset_x = vrect.x, offset_y = vrect.y;
+    if (viewport.x < 16 * 2) {
+        m_txt_rect.x = 0;
+    } else if (viewport.x + 640 + 16*2>= WORLD_WIDTH * 16) {
+        m_txt_rect.x = WORLD_WIDTH*16 - m_txt_rect.w;
+    }
+    if (viewport.y < 16 * 2) {
+        m_txt_rect.y = 0;
+    } else if (viewport.y + 480 + 16*2>= WORLD_HEIGHT * 16) {
+        m_txt_rect.y = WORLD_HEIGHT*16 - m_txt_rect.h;
+    }
 
-    for (int i = 0; i <= vrect.w/16; i++) {
+    int offset_x = m_txt_rect.x, offset_y = m_txt_rect.y;
+
+    for (int i = 0; i <= m_txt_rect.w/16; i++) {
         int tile_x_pos = i + offset_x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j <= vrect.h/16; j++) {
+        for (int j = 0; j <= m_txt_rect.h/16; j++) {
             int tile_y_pos = j + offset_y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;
@@ -91,6 +113,43 @@ void World::render(const Viewport &viewport)
                            nullptr, &rect);
         }
     }
+
+    SDL_SetRenderTarget(m_renderer.get(), nullptr);
+}
+
+void World::render(const Viewport &viewport)
+{
+    SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
+    SDL_RenderClear(m_renderer.get());
+
+    SDL_Rect vrect = viewport.get_rect();
+    // if viewport is inside texture
+    if (vrect.x >= m_txt_rect.x && vrect.y >= m_txt_rect.y &&
+        vrect.x+vrect.w <= m_txt_rect.x+m_txt_rect.w &&
+        vrect.y+vrect.h <= m_txt_rect.y+m_txt_rect.h) {
+    } else {
+    // else refresh_texture to make it inside viewport
+        if (vrect.x - 16*2 < 0) {
+            m_txt_rect.x = 0;
+        } else if (vrect.x + 640 + 16*2 >= WORLD_WIDTH*16) {
+            m_txt_rect.x = (WORLD_WIDTH * 16 - 640) - 16*4;
+        } else {
+            m_txt_rect.x = vrect.x - (vrect.x % 16) - 16*2;
+        }
+        if (vrect.y - 16*2 < 0) {
+            m_txt_rect.y = 0;
+        } else if (vrect.y + 480 + 16*2 >= WORLD_HEIGHT*16) {
+            m_txt_rect.y = (WORLD_HEIGHT * 16 - 480) - 16*4;
+        } else {
+            m_txt_rect.y = vrect.y - (vrect.y % 16) - 16*2;
+        }
+        refresh_texture(vrect);
+    }
+
+    SDL_Rect rect {vrect.x-m_txt_rect.x, vrect.y-m_txt_rect.y, 640, 480};
+    SDL_RenderCopy(m_renderer.get(), m_texture.get(),
+                   &rect, nullptr);
+
     m_lifeform->render(m_renderer.get());
     SDL_RenderPresent(m_renderer.get());
 

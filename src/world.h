@@ -19,11 +19,15 @@ public:
     void render(const Viewport &viewport);
 
 private:
+    void refresh_texture(const SDL_Rect &viewport);
+
     std::shared_ptr<SDL_Renderer> m_renderer;
     std::unique_ptr<LifeForm> m_lifeform;
     std::unique_ptr<Terrain> m_grass_terrain;
     std::unique_ptr<Terrain> m_water_terrain;
     std::array<Terrain*, WORLD_WIDTH * WORLD_HEIGHT> m_tiles;
+    std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> m_texture;
+    SDL_Rect m_txt_rect;
 };
 
 #endif
