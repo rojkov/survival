@@ -89,11 +89,15 @@ void World::refresh_texture(const SDL_Rect &viewport)
         m_txt_rect.x = 0;
     } else if (viewport.x + 640 + 16*2>= WORLD_WIDTH * 16) {
         m_txt_rect.x = WORLD_WIDTH*16 - m_txt_rect.w;
+    } else {
+        m_txt_rect.x = viewport.x - (viewport.x % 16) - 16*2;
     }
     if (viewport.y < 16 * 2) {
         m_txt_rect.y = 0;
     } else if (viewport.y + 480 + 16*2>= WORLD_HEIGHT * 16) {
         m_txt_rect.y = WORLD_HEIGHT*16 - m_txt_rect.h;
+    } else {
+        m_txt_rect.y = viewport.y - (viewport.y % 16) - 16*2;
     }
 
     int offset_x = m_txt_rect.x, offset_y = m_txt_rect.y;
@@ -129,20 +133,6 @@ void World::render(const Viewport &viewport)
         vrect.y+vrect.h <= m_txt_rect.y+m_txt_rect.h) {
     } else {
     // else refresh_texture to make it inside viewport
-        if (vrect.x - 16*2 < 0) {
-            m_txt_rect.x = 0;
-        } else if (vrect.x + 640 + 16*2 >= WORLD_WIDTH*16) {
-            m_txt_rect.x = (WORLD_WIDTH * 16 - 640) - 16*4;
-        } else {
-            m_txt_rect.x = vrect.x - (vrect.x % 16) - 16*2;
-        }
-        if (vrect.y - 16*2 < 0) {
-            m_txt_rect.y = 0;
-        } else if (vrect.y + 480 + 16*2 >= WORLD_HEIGHT*16) {
-            m_txt_rect.y = (WORLD_HEIGHT * 16 - 480) - 16*4;
-        } else {
-            m_txt_rect.y = vrect.y - (vrect.y % 16) - 16*2;
-        }
         refresh_texture(vrect);
     }
 
