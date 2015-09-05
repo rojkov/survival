@@ -36,8 +36,8 @@ int App::execute()
         return -1;
     }
 
-    World world(m_renderer);
     Viewport viewport(Rect(0, 0, 640, 480));
+    World world(m_renderer, viewport.get_rect());
     bool done(false);
     SDL_Event Event;
     uint32_t previous(SDL_GetTicks());

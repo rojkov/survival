@@ -12,13 +12,13 @@ static int g_fps = 0;
 
 typedef std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> unique_surf;
 
-World::World(std::shared_ptr<SDL_Renderer> renderer)
+World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     : m_renderer(renderer)
     , m_lifeform(new LifeForm(50, 50))
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
-    , m_txt_rect(0, 0, 640+4*16, 480+4*16)
+    , m_txt_rect(Rect(viewport_rect.offset(), viewport_rect.size().sum(Size(16*4, 16*4))))
 {
     unique_surf temp_surf(IMG_Load("tileset.png"), SDL_FreeSurface);
     assert(temp_surf != nullptr);
@@ -70,7 +70,7 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
                                       SDL_TEXTUREACCESS_TARGET,
                                       size.width(), size.height()));
     assert(m_texture != nullptr);
-    refresh_texture(Rect(0, 0, 640, 480));
+    refresh_texture(viewport_rect);
 }
 
 void World::update(uint32_t elapsed)
