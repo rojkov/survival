@@ -18,6 +18,8 @@
                 'src/terrain.h',
                 'src/viewport.cpp',
                 'src/viewport.h',
+                'src/geometry.cpp',
+                'src/geometry.h',
             ],
             'cflags': [
                 '<!@(<(pkg-config) --cflags sdl2)',

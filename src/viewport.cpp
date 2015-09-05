@@ -1,27 +1,20 @@
 #include "viewport.h"
-#include <SDL.h>
 
-Viewport::Viewport(int offset_x, int offset_y, int width, int height)
-    : m_offset_x(offset_x)
-    , m_offset_y(offset_y)
-    , m_width(width)
-    , m_height(height)
+Viewport::Viewport(Rect rect)
+    : m_rect(rect)
 {
 }
 
-void Viewport::move(int delta_x, int delta_y)
+const Rect Viewport::get_rect() const
 {
-    int new_offset_x = m_offset_x + delta_x;
-    if (new_offset_x >= 0 && new_offset_x < 50 * 16 - 640) {
-        m_offset_x = new_offset_x;
-    }
-    int new_offset_y = m_offset_y + delta_y;
-    if (new_offset_y >= 0 && new_offset_y < 50 * 16 - 480) {
-        m_offset_y = new_offset_y;
-    }
+    return m_rect;
 }
 
-SDL_Rect Viewport::get_rect() const
+void Viewport::move(const Point &delta)
 {
-    return SDL_Rect {m_offset_x, m_offset_y, m_width, m_height};
+    Rect new_rect = m_rect;
+    new_rect.move(delta);
+    if (new_rect.is_inside(Rect(0, 0, 50 * 16, 50 * 16))) {
+        m_rect = new_rect;
+    }
 }

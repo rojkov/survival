@@ -37,7 +37,7 @@ int App::execute()
     }
 
     World world(m_renderer);
-    Viewport viewport(0, 0, 640, 480);
+    Viewport viewport(Rect(0, 0, 640, 480));
     bool done(false);
     SDL_Event Event;
     uint32_t previous(SDL_GetTicks());
@@ -56,17 +56,17 @@ int App::execute()
 
         const uint8_t* current_key_states = SDL_GetKeyboardState(nullptr);
         if (current_key_states[SDL_SCANCODE_UP]) {
-            viewport.move(0, -1);
+            viewport.move(Point(0, -1));
         } else if (current_key_states[SDL_SCANCODE_DOWN]) {
-            viewport.move(0, 1);
+            viewport.move(Point(0, 1));
         } else if (current_key_states[SDL_SCANCODE_LEFT]) {
-            viewport.move(-1, 0);
+            viewport.move(Point(-1, 0));
         } else if (current_key_states[SDL_SCANCODE_RIGHT]) {
-            viewport.move(1, 0);
+            viewport.move(Point(1, 0));
         }
 
         world.update(elapsed);
-        world.render(viewport);
+        world.render(viewport.get_rect());
     }
 
     return 0;

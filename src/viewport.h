@@ -1,21 +1,19 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
-struct SDL_Rect;
+#include "geometry.h"
 
 class Viewport
 {
 public:
-    Viewport(int offset_x, int offset_y, int width, int height);
+    Viewport(Rect rect);
 
-    void move(int delta_x, int delta_y);
-    SDL_Rect get_rect() const;
+    const Rect get_rect() const;
+
+    void move(const Point &delta);
 
 private:
-    int m_offset_x;
-    int m_offset_y;
-    int m_width;
-    int m_height;
+    Rect m_rect;
 };
 
 #endif // VIEWPORT_H

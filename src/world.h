@@ -4,6 +4,7 @@
 #include <memory>
 #include "lifeform.h"
 #include "terrain.h"
+#include "geometry.h"
 
 #define WORLD_WIDTH 50
 #define WORLD_HEIGHT 50
@@ -16,10 +17,10 @@ public:
     World(std::shared_ptr<SDL_Renderer> renderer);
 
     void update(uint32_t elapsed);
-    void render(const Viewport &viewport);
+    void render(const Rect &viewport);
 
 private:
-    void refresh_texture(const SDL_Rect &viewport);
+    void refresh_texture(const Rect &viewport);
 
     std::shared_ptr<SDL_Renderer> m_renderer;
     std::unique_ptr<LifeForm> m_lifeform;
@@ -27,7 +28,7 @@ private:
     std::unique_ptr<Terrain> m_water_terrain;
     std::array<Terrain*, WORLD_WIDTH * WORLD_HEIGHT> m_tiles;
     std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> m_texture;
-    SDL_Rect m_txt_rect;
+    Rect m_txt_rect;
 };
 
 #endif

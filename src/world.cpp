@@ -18,8 +18,8 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
+    , m_txt_rect(0, 0, 640+4*16, 480+4*16)
 {
-    m_txt_rect = {0, 0, 640+4*16, 480+4*16};
     unique_surf temp_surf(IMG_Load("tileset.png"), SDL_FreeSurface);
     assert(temp_surf != nullptr);
     unique_surf grass_surf(SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0),
@@ -65,12 +65,12 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     }
 
     // Create world texture
+    Size size = m_txt_rect.size();
     m_texture.reset(SDL_CreateTexture(m_renderer.get(), SDL_PIXELFORMAT_RGBA8888,
                                       SDL_TEXTUREACCESS_TARGET,
-                                      m_txt_rect.w, m_txt_rect.h));
+                                      size.width(), size.height()));
     assert(m_texture != nullptr);
-    SDL_Rect iv {0, 0, 640, 480};
-    refresh_texture(iv);
+    refresh_texture(Rect(0, 0, 640, 480));
 }
 
 void World::update(uint32_t elapsed)
@@ -78,36 +78,29 @@ void World::update(uint32_t elapsed)
     m_lifeform->update(elapsed);
 }
 
-void World::refresh_texture(const SDL_Rect &viewport)
+void World::refresh_texture(const Rect &viewport)
 {
-    SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", viewport.x, viewport.y, viewport.w, viewport.h, m_txt_rect.x, m_txt_rect.y, m_txt_rect.w, m_txt_rect.h);
     SDL_SetRenderTarget(m_renderer.get(), m_texture.get());
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    if (viewport.x < 16 * 2) {
-        m_txt_rect.x = 0;
-    } else if (viewport.x + 640 + 16*2>= WORLD_WIDTH * 16) {
-        m_txt_rect.x = WORLD_WIDTH*16 - m_txt_rect.w;
-    } else {
-        m_txt_rect.x = viewport.x - (viewport.x % 16) - 16*2;
-    }
-    if (viewport.y < 16 * 2) {
-        m_txt_rect.y = 0;
-    } else if (viewport.y + 480 + 16*2>= WORLD_HEIGHT * 16) {
-        m_txt_rect.y = WORLD_HEIGHT*16 - m_txt_rect.h;
-    } else {
-        m_txt_rect.y = viewport.y - (viewport.y % 16) - 16*2;
-    }
+    int padding = 16 * 2;
+    Rect txt_rect = Rect(Point(viewport.offset().sum(Point(-padding, -padding))),
+                         Size(viewport.size().sum(Size(2*padding, 2*padding))));
+    txt_rect.move(Point(-1 * (viewport.offset().x() % 16),
+                        -1 * (viewport.offset().y() % 16)));
 
-    int offset_x = m_txt_rect.x, offset_y = m_txt_rect.y;
+    txt_rect.move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
+    m_txt_rect = txt_rect;
 
-    for (int i = 0; i <= m_txt_rect.w/16; i++) {
+    int offset_x = m_txt_rect.offset().x(), offset_y = m_txt_rect.offset().y();
+
+    for (int i = 0; i <= m_txt_rect.size().width()/16; i++) {
         int tile_x_pos = i + offset_x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j <= m_txt_rect.h/16; j++) {
+        for (int j = 0; j <= m_txt_rect.size().height()/16; j++) {
             int tile_y_pos = j + offset_y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;
@@ -119,24 +112,22 @@ void World::refresh_texture(const SDL_Rect &viewport)
     }
 
     SDL_SetRenderTarget(m_renderer.get(), nullptr);
+
+    SDL_Rect srect = m_txt_rect.as_sdl_rect();
+    SDL_Rect vrect = viewport.as_sdl_rect();
+    SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", vrect.x, vrect.y, vrect.w, vrect.h, srect.x, srect.y, srect.w, srect.h);
 }
 
-void World::render(const Viewport &viewport)
+void World::render(const Rect &viewport)
 {
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    SDL_Rect vrect = viewport.get_rect();
-    // if viewport is inside texture
-    if (vrect.x >= m_txt_rect.x && vrect.y >= m_txt_rect.y &&
-        vrect.x+vrect.w <= m_txt_rect.x+m_txt_rect.w &&
-        vrect.y+vrect.h <= m_txt_rect.y+m_txt_rect.h) {
-    } else {
-    // else refresh_texture to make it inside viewport
-        refresh_texture(vrect);
+    if (!viewport.is_inside(m_txt_rect)) {
+        refresh_texture(viewport);
     }
 
-    SDL_Rect rect {vrect.x-m_txt_rect.x, vrect.y-m_txt_rect.y, 640, 480};
+    SDL_Rect rect  = m_txt_rect.get_relative_intersection(viewport).as_sdl_rect();
     SDL_RenderCopy(m_renderer.get(), m_texture.get(),
                    &rect, nullptr);
 
