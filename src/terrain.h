@@ -12,7 +12,7 @@ public:
         WATER
     };
 
-    explicit Terrain(TerrainType type, SDL_Texture* texture);
+    Terrain(TerrainType type, SDL_Texture* texture);
 
     SDL_Texture * const get_texture() const;
 
