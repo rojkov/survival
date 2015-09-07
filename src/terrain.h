@@ -14,6 +14,7 @@ public:
 
     Terrain(TerrainType type, SDL_Texture* texture);
 
+    bool passable() const;
     SDL_Texture * const get_texture() const;
 
 private:

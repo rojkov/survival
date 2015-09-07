@@ -8,6 +8,11 @@ Terrain::Terrain(TerrainType type, SDL_Texture* texture)
     assert(m_texture != nullptr);
 }
 
+bool Terrain::passable() const
+{
+    return m_type == GRASS;
+}
+
 SDL_Texture * const Terrain::get_texture() const
 {
     return m_texture.get();
