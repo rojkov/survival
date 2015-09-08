@@ -20,6 +20,8 @@
                 'src/viewport.h',
                 'src/geometry.cpp',
                 'src/geometry.h',
+                'src/graphalg/a_star_search.h',
+                'src/graphalg/gridgraph.h',
             ],
             'cflags': [
                 '<!@(<(pkg-config) --cflags sdl2)',
