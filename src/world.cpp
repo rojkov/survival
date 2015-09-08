@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <string>
 #include <vector>
-#include <tuple>
 #include "world.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
@@ -13,22 +12,11 @@ static int g_fps = 0;
 
 typedef std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> unique_surf;
 
-inline int heuristic(WorldGrid::Location a, WorldGrid::Location b) {
+inline int heuristic(GridLocation a, GridLocation b) {
     int x1, y1, x2, y2;
     std::tie(x1, y1) = a;
     std::tie(x2, y2) = b;
     return abs(x1 - x2) + abs(y1 + y2);
-}
-
-namespace std {
-template <>
-struct hash<tuple<int,int> > {
-    inline size_t operator()(const tuple<int,int>& location) const {
-        int x, y;
-        tie (x, y) = location;
-        return y * WORLD_HEIGHT + x;
-    }
-};
 }
 
 World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
@@ -75,10 +63,10 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     assert(m_texture != nullptr);
     refresh_texture(viewport_rect);
 
-    WorldGrid::Location start {0, 3};
-    WorldGrid::Location goal {1, 5};
-    std::function<int(WorldGrid::Location, WorldGrid::Location)> h_func = heuristic;
-    std::vector<WorldGrid::Location> path = a_star_search(m_tiles, start, goal, h_func);
+    GridLocation start {0, 3};
+    GridLocation goal {1, 5};
+    std::function<int(GridLocation, GridLocation)> h_func = heuristic;
+    std::vector<GridLocation> path = a_star_search(m_tiles, start, goal, h_func);
     for (auto loc : path) {
         int x, y;
         std::tie(x, y) = loc;
