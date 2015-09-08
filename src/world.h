@@ -25,6 +25,7 @@ public:
 private:
 
     void refresh_texture(const Rect &viewport);
+    std::vector<Point> as_world_path(const std::vector<GridLocation> &path);
 
     std::shared_ptr<SDL_Renderer> m_renderer;
     std::unique_ptr<LifeForm> m_lifeform;

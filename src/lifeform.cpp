@@ -16,6 +16,6 @@ void LifeForm::update(uint32_t elapsed)
 void LifeForm::render(SDL_Renderer* renderer)
 {
     SDL_Rect rect {(int)round(m_pos_x), (int)round(m_pos_y), 8, 8};
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
 }

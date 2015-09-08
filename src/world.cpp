@@ -64,7 +64,7 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     refresh_texture(viewport_rect);
 
     GridLocation start {0, 3};
-    GridLocation goal {1, 5};
+    GridLocation goal {28, 3};
     std::function<int(GridLocation, GridLocation)> h_func = heuristic;
     std::vector<GridLocation> path = a_star_search(m_tiles, start, goal, h_func);
     for (auto loc : path) {
@@ -73,6 +73,18 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
         printf("{%d, %d} ", x, y);
     }
     printf("\n");
+    std::vector<Point> wpath = as_world_path(path);
+    SDL_SetRenderTarget(m_renderer.get(), m_texture.get());
+    SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 255);
+    Point pt0(0, 0);
+    for (auto pt : wpath) {
+        printf("pt {%d, %d}\n", pt.x(), pt.y());
+        if (pt0.x() != 0 && pt0.y() != 0) {
+            SDL_RenderDrawLine(m_renderer.get(), pt0.x(), pt0.y(), pt.x(), pt.y());
+        }
+        pt0 = pt;
+    }
+    SDL_SetRenderTarget(m_renderer.get(), nullptr);
 }
 
 void World::update(uint32_t elapsed)
@@ -118,6 +130,63 @@ void World::refresh_texture(const Rect &viewport)
     SDL_Rect srect = m_txt_rect.as_sdl_rect();
     SDL_Rect vrect = viewport.as_sdl_rect();
     SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", vrect.x, vrect.y, vrect.w, vrect.h, srect.x, srect.y, srect.w, srect.h);
+}
+
+std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path)
+{
+    std::vector<Point> result;
+    int current_x, current_y;
+    int dir = 0; // 1 - right, 2 - down, 3 - left, 4 - up
+    std::tie(current_x, current_y) = path.front();
+    result.emplace_back(current_x * 16 + 16/2, current_y * 16 + 16/2);
+    for (auto iter=path.begin() + 1; iter!= path.end(); ++iter) {
+        int pos_x, pos_y;
+        std::tie(pos_x, pos_y) = *iter;
+        if (pos_y == current_y && pos_x > current_x && dir != 1) {
+            if (dir == 2) {
+                // 8 - width of lifeform
+                result.emplace_back(pos_x * 16 - 8/2,
+                                    pos_y * 16 + 8/2);
+            } else if (dir == 4) {
+                result.emplace_back(current_x * 16 + 8/2,
+                                    pos_y * 16 + 8/2);
+            }
+            dir = 1;
+        } else if (pos_x == current_x && pos_y > current_y && dir != 2) {
+            if (dir == 1) {
+                result.emplace_back(pos_x * 16 + 8/2,
+                                    pos_y * 16 - 8/2);
+            } else if (dir == 3) {
+                result.emplace_back(pos_x * 16 - 8/2,
+                                    pos_y * 16 - 8/2);
+            }
+            dir = 2;
+        } else if (pos_y == current_y && pos_x < current_x && dir != 3) {
+            if (dir == 2) {
+                result.emplace_back(current_x * 16 - 8/2,
+                                    pos_y * 16 + 8/2);
+            } else if (dir == 4) {
+                result.emplace_back(current_x * 16 + 8/2,
+                                    pos_y * 16 - 8/2);
+            }
+            dir = 3;
+        } else if (pos_x == current_x && pos_y < current_y && dir != 4) {
+            if (dir == 1) {
+                result.emplace_back(pos_x * 16 + 8/2,
+                                    current_y * 16 + 8/2);
+            } else if (dir == 3) {
+                result.emplace_back(pos_x * 16 - 8/2,
+                                    current_y * 16 - 8/2);
+            }
+            dir = 4;
+        } else {
+            printf("Oops.\n");
+        }
+        current_x = pos_x; current_y = pos_y;
+    }
+    std::tie(current_x, current_y) = path.back();
+    result.emplace_back(current_x * 16 + 16/2, current_y * 16 + 16/2);
+    return result;
 }
 
 void World::render(const Rect &viewport)
