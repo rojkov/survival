@@ -7,10 +7,19 @@ LifeForm::LifeForm(double pos_x, double pos_y)
 {
 }
 
+WorldPoint LifeForm::get_pos() const
+{
+    return WorldPoint(m_pos_x, m_pos_y);
+}
+
+void LifeForm::move_to(const WorldPoint &new_position)
+{
+    m_pos_x = new_position.x();
+    m_pos_y = new_position.y();
+}
+
 void LifeForm::update(uint32_t elapsed)
 {
-    m_pos_x += 0.03 * elapsed;
-    m_pos_y += 0.03 * elapsed;
 }
 
 void LifeForm::render(SDL_Renderer* renderer)

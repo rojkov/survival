@@ -22,6 +22,10 @@
                 'src/geometry.h',
                 'src/graphalg/a_star_search.h',
                 'src/graphalg/gridgraph.h',
+                'src/commands/command.h',
+                'src/commands/command.cpp',
+                'src/commands/move_command.h',
+                'src/commands/move_command.cpp',
             ],
             'cflags': [
                 '<!@(<(pkg-config) --cflags sdl2)',

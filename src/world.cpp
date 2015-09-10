@@ -6,6 +6,7 @@
 #include "world.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
+#include "commands/move_command.h"
 
 static uint32_t g_last_ticks = 0;
 static int g_fps = 0;
@@ -85,11 +86,30 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
         pt0 = pt;
     }
     SDL_SetRenderTarget(m_renderer.get(), nullptr);
+
+    for (auto pt : wpath) {
+        m_commands.emplace(new MoveCommand(m_lifeform, WorldPoint(pt.x(), pt.y())));
+    }
 }
 
 void World::update(uint32_t elapsed)
 {
     m_lifeform->update(elapsed);
+    if (m_commands.empty()) {
+        return;
+    }
+    std::shared_ptr<Command> command = m_commands.front();
+    uint32_t timeleft = elapsed;
+    while (timeleft) {
+        timeleft = command->update(timeleft);
+        if (command->done()) {
+            m_commands.pop();
+            if (m_commands.empty()) {
+                break;
+            }
+            command = m_commands.front();
+        }
+    }
 }
 
 void World::refresh_texture(const Rect &viewport)
