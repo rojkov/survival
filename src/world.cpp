@@ -92,6 +92,35 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     }
 }
 
+void World::handle_event(const SDL_Event &event)
+{
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            WorldPoint pos = m_lifeform->get_pos();
+            Rect rect((int)round(pos.x()) - 8/2, (int)round(pos.y()) - 8/2, 8, 8);
+            if (rect.contains(Point(event.button.x, event.button.y))) {
+                m_lifeform->set_focused(true);
+            } else {
+                m_lifeform->set_focused(false);
+            }
+        } else if (m_lifeform->focused() && event.button.button == SDL_BUTTON_RIGHT) {
+            // Cancel m_lifeform's commands
+            while (!m_commands.empty()) {
+                m_commands.pop();
+            }
+            WorldPoint pos = m_lifeform->get_pos();
+            GridLocation start {(int)round(pos.x())/16, (int)round(pos.y())/16};
+            GridLocation goal {event.button.x /* + viewport offset*/ / 16, event.button.y /* + viewport offset*/ / 16};
+            std::function<int(GridLocation, GridLocation)> h_func = heuristic;
+            std::vector<GridLocation> path = a_star_search(m_tiles, start, goal, h_func);
+            std::vector<Point> wpath = as_world_path(path);
+            for (auto pt : wpath) {
+                m_commands.emplace(new MoveCommand(m_lifeform, WorldPoint(pt.x(), pt.y())));
+            }
+        }
+    }
+}
+
 void World::update(uint32_t elapsed)
 {
     m_lifeform->update(elapsed);

@@ -39,7 +39,7 @@ int App::execute()
     Viewport viewport(Rect(0, 0, 640, 480));
     World world(m_renderer, viewport.get_rect());
     bool done(false);
-    SDL_Event Event;
+    SDL_Event event;
     uint32_t previous(SDL_GetTicks());
 
     while (!done) {
@@ -48,8 +48,8 @@ int App::execute()
         previous = current;
 
         // Handle pending events
-        while (SDL_PollEvent(&Event)) {
-            if (Event.type == SDL_QUIT) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
                 done = true;
             }
         }
@@ -64,6 +64,8 @@ int App::execute()
         } else if (current_key_states[SDL_SCANCODE_RIGHT]) {
             viewport.move(Point(1, 0));
         }
+
+        world.handle_event(event);
 
         world.update(elapsed);
         world.render(viewport.get_rect());

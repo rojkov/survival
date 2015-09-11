@@ -21,6 +21,7 @@ class World
 public:
     World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect);
 
+    void handle_event(const SDL_Event &event);
     void update(uint32_t elapsed);
     void render(const Rect &viewport);
 

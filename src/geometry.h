@@ -48,6 +48,7 @@ public:
     Size size() const { return m_size; };
     Point offset() const { return m_offset; };
     bool is_inside(const Rect &rect) const;
+    bool contains(const Point &point) const;
     Rect get_relative_intersection(const Rect &rect) const;
     SDL_Rect as_sdl_rect() const;
 

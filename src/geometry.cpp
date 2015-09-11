@@ -1,6 +1,17 @@
 #include "geometry.h"
 #include <SDL_rect.h>
 
+bool Rect::contains(const Point &point) const
+{
+    if (point.x() >= m_offset.x() && point.x() <= m_offset.x() + m_size.width() &&
+        point.y() >= m_offset.y() && point.y() <= m_offset.y() + m_size.height())
+    {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool Rect::is_inside(const Rect &rect) const
 {
     int offset_x = m_offset.x(), offset_y = m_offset.y(),
