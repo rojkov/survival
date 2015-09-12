@@ -52,7 +52,7 @@ void LifeForm::update(uint32_t elapsed)
     if (m_commands.empty()) {
         return;
     }
-    auto command = m_commands.front();
+    auto command = m_commands.front().get();
     uint32_t timeleft = elapsed;
     while (timeleft) {
         timeleft = command->update(timeleft);
@@ -61,7 +61,7 @@ void LifeForm::update(uint32_t elapsed)
             if (m_commands.empty()) {
                 break;
             }
-            command = m_commands.front();
+            command = m_commands.front().get();
         }
     }
 }

@@ -29,7 +29,7 @@ private:
     double m_pos_x;
     double m_pos_y;
     bool m_focused;
-    std::queue<std::shared_ptr<Command> > m_commands;
+    std::queue<std::unique_ptr<Command> > m_commands;
 };
 
 #endif // LIFEFORM_H
