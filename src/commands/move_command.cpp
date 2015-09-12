@@ -1,6 +1,7 @@
 #include "move_command.h"
+#include "../lifeform.h"
 
-MoveCommand::MoveCommand(std::shared_ptr<LifeForm> actor, const WorldPoint &end)
+MoveCommand::MoveCommand(LifeForm* actor, const WorldPoint &end)
     : Command(actor)
     , m_goal(end)
 {

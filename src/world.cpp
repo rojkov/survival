@@ -6,7 +6,6 @@
 #include "world.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
-#include "commands/move_command.h"
 
 static uint32_t g_last_ticks = 0;
 static int g_fps = 0;
@@ -22,7 +21,6 @@ inline int heuristic(GridLocation a, GridLocation b) {
 
 World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     : m_renderer(renderer)
-    , m_lifeform(new LifeForm(50, 50))
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
@@ -63,81 +61,34 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
                                       size.width(), size.height()));
     assert(m_texture != nullptr);
     refresh_texture(viewport_rect);
+}
 
-    GridLocation start {0, 3};
-    GridLocation goal {28, 3};
+std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &end) const
+{
+    GridLocation current {(int)round(start.x())/16, (int)round(start.y())/16};
+    GridLocation goal {(int)round(end.x())/16, (int)round(end.y())/16};
     std::function<int(GridLocation, GridLocation)> h_func = heuristic;
-    std::vector<GridLocation> path = a_star_search(m_tiles, start, goal, h_func);
-    for (auto loc : path) {
-        int x, y;
-        std::tie(x, y) = loc;
-        printf("{%d, %d} ", x, y);
-    }
-    printf("\n");
-    std::vector<Point> wpath = as_world_path(path);
-    SDL_SetRenderTarget(m_renderer.get(), m_texture.get());
-    SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 255);
-    Point pt0(0, 0);
-    for (auto pt : wpath) {
-        printf("pt {%d, %d}\n", pt.x(), pt.y());
-        if (pt0.x() != 0 && pt0.y() != 0) {
-            SDL_RenderDrawLine(m_renderer.get(), pt0.x(), pt0.y(), pt.x(), pt.y());
-        }
-        pt0 = pt;
-    }
-    SDL_SetRenderTarget(m_renderer.get(), nullptr);
+    auto path = a_star_search(m_tiles, current, goal, h_func);
+    auto wpath = as_world_path(path);
+    return wpath;
+}
 
-    for (auto pt : wpath) {
-        m_commands.emplace(new MoveCommand(m_lifeform, WorldPoint(pt.x(), pt.y())));
-    }
+void World::add_entity(std::shared_ptr<LifeForm> entity)
+{
+    m_lifeforms.push_back(entity);
 }
 
 void World::handle_event(const SDL_Event &event)
 {
-    if (event.type == SDL_MOUSEBUTTONDOWN) {
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            WorldPoint pos = m_lifeform->get_pos();
-            Rect rect((int)round(pos.x()) - 8/2, (int)round(pos.y()) - 8/2, 8, 8);
-            if (rect.contains(Point(event.button.x, event.button.y))) {
-                m_lifeform->set_focused(true);
-            } else {
-                m_lifeform->set_focused(false);
-            }
-        } else if (m_lifeform->focused() && event.button.button == SDL_BUTTON_RIGHT) {
-            // Cancel m_lifeform's commands
-            while (!m_commands.empty()) {
-                m_commands.pop();
-            }
-            WorldPoint pos = m_lifeform->get_pos();
-            GridLocation start {(int)round(pos.x())/16, (int)round(pos.y())/16};
-            GridLocation goal {event.button.x /* + viewport offset*/ / 16, event.button.y /* + viewport offset*/ / 16};
-            std::function<int(GridLocation, GridLocation)> h_func = heuristic;
-            std::vector<GridLocation> path = a_star_search(m_tiles, start, goal, h_func);
-            std::vector<Point> wpath = as_world_path(path);
-            for (auto pt : wpath) {
-                m_commands.emplace(new MoveCommand(m_lifeform, WorldPoint(pt.x(), pt.y())));
-            }
-        }
+    for (auto entity : m_lifeforms) {
+        entity->handle_event(event);
     }
 }
 
 void World::update(uint32_t elapsed)
 {
-    m_lifeform->update(elapsed);
-    if (m_commands.empty()) {
-        return;
-    }
-    std::shared_ptr<Command> command = m_commands.front();
-    uint32_t timeleft = elapsed;
-    while (timeleft) {
-        timeleft = command->update(timeleft);
-        if (command->done()) {
-            m_commands.pop();
-            if (m_commands.empty()) {
-                break;
-            }
-            command = m_commands.front();
-        }
+    for (auto entity : m_lifeforms) {
+        entity->update(elapsed);
     }
 }
 
@@ -181,7 +132,7 @@ void World::refresh_texture(const Rect &viewport)
     SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", vrect.x, vrect.y, vrect.w, vrect.h, srect.x, srect.y, srect.w, srect.h);
 }
 
-std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path)
+std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path) const
 {
     std::vector<Point> result;
     int current_x, current_y;
@@ -251,7 +202,9 @@ void World::render(const Rect &viewport)
     SDL_RenderCopy(m_renderer.get(), m_texture.get(),
                    &rect, nullptr);
 
-    m_lifeform->render(m_renderer.get());
+    for (auto entity : m_lifeforms) {
+        entity->render(m_renderer.get());
+    }
     SDL_RenderPresent(m_renderer.get());
 
     // Calculate FPS

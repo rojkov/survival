@@ -37,7 +37,9 @@ int App::execute()
     }
 
     Viewport viewport(Rect(0, 0, 640, 480));
-    World world(m_renderer, viewport.get_rect());
+    std::shared_ptr<World> world = std::make_shared<World>(m_renderer, viewport.get_rect());
+    world->add_entity(std::make_shared<LifeForm>(world, 50, 50));
+    world->add_entity(std::make_shared<LifeForm>(world, 150, 200));
     bool done(false);
     SDL_Event event;
     uint32_t previous(SDL_GetTicks());
@@ -65,10 +67,10 @@ int App::execute()
             viewport.move(Point(1, 0));
         }
 
-        world.handle_event(event);
+        world->handle_event(event);
 
-        world.update(elapsed);
-        world.render(viewport.get_rect());
+        world->update(elapsed);
+        world->render(viewport.get_rect());
     }
 
     return 0;

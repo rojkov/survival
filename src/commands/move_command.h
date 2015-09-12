@@ -7,7 +7,7 @@
 class MoveCommand : public Command
 {
 public:
-    MoveCommand(std::shared_ptr<LifeForm> actor, const WorldPoint &end);
+    MoveCommand(LifeForm* actor, const WorldPoint &end);
 
     uint32_t update(uint32_t elapsed) override;
 
