@@ -17,16 +17,13 @@ public:
     T abs() const { return sqrt(m_x*m_x + m_y*m_y); };
     BasePoint scale(double s) const { return BasePoint(s * m_x, s * m_y); };
 
-    void set_x(T x) { m_x = x; };
-    void set_y(T y) { m_y = y; };
-
 private:
     T m_x;
     T m_y;
 };
 
-typedef BasePoint<int> Point;
-typedef BasePoint<double> WorldPoint;
+using Point = BasePoint<int>;
+using WorldPoint = BasePoint<double>;
 
 class Size {
 public:
@@ -52,8 +49,8 @@ public:
     Rect get_relative_intersection(const Rect &rect) const;
     SDL_Rect as_sdl_rect() const;
 
-    void move(const Point &delta);
-    void move_inside(const Rect &big_rect);
+    const Rect move(const Point &delta) const;
+    const Rect move_inside(const Rect &big_rect) const;
 
 private:
     Point m_offset;

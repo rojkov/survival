@@ -12,8 +12,7 @@ const Rect Viewport::get_rect() const
 
 void Viewport::move(const Point &delta)
 {
-    Rect new_rect = m_rect;
-    new_rect.move(delta);
+    Rect new_rect(m_rect.move(delta));
     if (new_rect.is_inside(Rect(0, 0, 50 * 16, 50 * 16))) {
         m_rect = new_rect;
     }

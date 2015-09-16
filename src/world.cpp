@@ -99,13 +99,11 @@ void World::refresh_texture(const Rect &viewport)
     SDL_RenderClear(m_renderer.get());
 
     int padding = 16 * 2;
-    Rect txt_rect = Rect(Point(viewport.offset().sum(Point(-padding, -padding))),
-                         Size(viewport.size().sum(Size(2*padding, 2*padding))));
-    txt_rect.move(Point(-1 * (viewport.offset().x() % 16),
-                        -1 * (viewport.offset().y() % 16)));
-
-    txt_rect.move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
-    m_txt_rect = txt_rect;
+    m_txt_rect = Rect(Point(viewport.offset().sum(Point(-padding, -padding))),
+                            Size(viewport.size().sum(Size(2*padding, 2*padding))))
+                      .move(Point(-1 * (viewport.offset().x() % 16),
+                                  -1 * (viewport.offset().y() % 16)))
+                      .move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
 
     int offset_x = m_txt_rect.offset().x(), offset_y = m_txt_rect.offset().y();
 

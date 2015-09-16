@@ -59,24 +59,27 @@ SDL_Rect Rect::as_sdl_rect() const
     return sdlrect;
 }
 
-void Rect::move(const Point &delta)
+const Rect Rect::move(const Point &delta) const
 {
-    m_offset = m_offset.sum(delta);
+    return Rect(m_offset.sum(delta), m_size);
 }
 
-void Rect::move_inside(const Rect &big_rect)
+const Rect Rect::move_inside(const Rect &big_rect) const
 {
+    int x(m_offset.x()), y(m_offset.y());
+
     if (m_offset.x() < big_rect.m_offset.x()) {
-        m_offset.set_x(big_rect.m_offset.x());
+        x = big_rect.m_offset.x();
     } else if (m_offset.x() + m_size.width() >
                big_rect.m_offset.x() + big_rect.m_size.width()) {
-        m_offset.set_x(big_rect.m_size.width() - m_size.width());
+        x = big_rect.m_size.width() - m_size.width();
     }
 
     if (m_offset.y() < big_rect.m_offset.y()) {
-        m_offset.set_y(big_rect.m_offset.y());
+        y = big_rect.m_offset.y();
     } else if (m_offset.y() + m_size.height() >
                big_rect.m_offset.y() + big_rect.m_size.height()) {
-        m_offset.set_y(big_rect.m_size.height() - m_size.height());
+        y = big_rect.m_size.height() - m_size.height();
     }
+    return Rect(Point(x, y), m_size);
 }
