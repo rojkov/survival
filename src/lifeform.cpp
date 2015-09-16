@@ -18,8 +18,8 @@ WorldPoint LifeForm::get_pos() const
 
 void LifeForm::move_to(const WorldPoint &new_position)
 {
-    m_pos_x = new_position.x();
-    m_pos_y = new_position.y();
+    m_pos_x = new_position.x;
+    m_pos_y = new_position.y;
 }
 
 void LifeForm::handle_event(const SDL_Event &event)
@@ -27,7 +27,7 @@ void LifeForm::handle_event(const SDL_Event &event)
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             WorldPoint pos = get_pos();
-            Rect rect((int)round(pos.x()) - 8/2, (int)round(pos.y()) - 8/2, 8, 8);
+            Rect rect((int)round(pos.x) - 8/2, (int)round(pos.y) - 8/2, 8, 8);
             if (rect.contains(Point(event.button.x, event.button.y))) {
                 set_focused(true);
             } else {
@@ -40,7 +40,7 @@ void LifeForm::handle_event(const SDL_Event &event)
             }
             if (auto world = m_world.lock()) {
                 for (auto pt : world->get_path(get_pos(), WorldPoint(event.button.x /* + viewport offset*/, event.button.y /* + viewport offset*/))) {
-                    m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x(), pt.y())));
+                    m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
                 }
             }
         }

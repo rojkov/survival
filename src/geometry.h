@@ -6,20 +6,16 @@
 struct SDL_Rect;
 
 template<typename T>
-class BasePoint {
-public:
-    BasePoint(T x, T y) : m_x(x), m_y(y) {};
-    T x() const { return m_x; };
-    T y() const { return m_y; };
-    BasePoint sum(const BasePoint& delta) const { return BasePoint(m_x + delta.m_x, m_y + delta.m_y); };
-    BasePoint substruct(const BasePoint& other) const { return BasePoint(m_x - other.m_x, m_y - other.m_y); };
+struct BasePoint {
+    T x;
+    T y;
 
-    T abs() const { return sqrt(m_x*m_x + m_y*m_y); };
-    BasePoint scale(double s) const { return BasePoint(s * m_x, s * m_y); };
+    BasePoint(const T ax, const T ay) : x(ax), y(ay) {};
+    BasePoint sum(const BasePoint& delta) const { return BasePoint(x + delta.x, y + delta.y); };
+    BasePoint substruct(const BasePoint& other) const { return BasePoint(x - other.x, y - other.y); };
 
-private:
-    T m_x;
-    T m_y;
+    T abs() const { return sqrt(x*x + y*y); };
+    BasePoint scale(double s) const { return BasePoint(s * x, s * y); };
 };
 
 using Point = BasePoint<int>;
@@ -39,7 +35,7 @@ private:
 
 class Rect {
 public:
-    Rect(int x, int y, int width, int height) : m_offset(x, y), m_size(width, height) {};
+    Rect(const int x, const int y, int width, int height) : m_offset(x, y), m_size(width, height) {};
     Rect(Point offset, Size size) : m_offset(offset), m_size(size) {};
 
     Size size() const { return m_size; };

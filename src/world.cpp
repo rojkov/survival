@@ -65,8 +65,8 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
 
 std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &end) const
 {
-    GridLocation current {(int)round(start.x())/16, (int)round(start.y())/16};
-    GridLocation goal {(int)round(end.x())/16, (int)round(end.y())/16};
+    GridLocation current {(int)round(start.x)/16, (int)round(start.y)/16};
+    GridLocation goal {(int)round(end.x)/16, (int)round(end.y)/16};
     std::function<int(GridLocation, GridLocation)> h_func = heuristic;
     auto path = a_star_search(m_tiles, current, goal, h_func);
     auto wpath = as_world_path(path);
@@ -101,11 +101,11 @@ void World::refresh_texture(const Rect &viewport)
     int padding = 16 * 2;
     m_txt_rect = Rect(Point(viewport.offset().sum(Point(-padding, -padding))),
                             Size(viewport.size().sum(Size(2*padding, 2*padding))))
-                      .move(Point(-1 * (viewport.offset().x() % 16),
-                                  -1 * (viewport.offset().y() % 16)))
+                      .move(Point(-1 * (viewport.offset().x % 16),
+                                  -1 * (viewport.offset().y % 16)))
                       .move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
 
-    int offset_x = m_txt_rect.offset().x(), offset_y = m_txt_rect.offset().y();
+    int offset_x = m_txt_rect.offset().x, offset_y = m_txt_rect.offset().y;
 
     for (int i = 0; i <= m_txt_rect.size().width()/16; i++) {
         int tile_x_pos = i + offset_x/16;
