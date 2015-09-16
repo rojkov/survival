@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <math.h>
+#include <algorithm>
 
 struct SDL_Rect;
 
@@ -10,11 +10,11 @@ struct BasePoint {
     T x;
     T y;
 
-    BasePoint(const T ax, const T ay) : x(ax), y(ay) {};
+    BasePoint(const T& ax, const T& ay) : x(ax), y(ay) {};
     BasePoint sum(const BasePoint& delta) const { return BasePoint(x + delta.x, y + delta.y); };
     BasePoint substruct(const BasePoint& other) const { return BasePoint(x - other.x, y - other.y); };
 
-    T abs() const { return sqrt(x*x + y*y); };
+    T abs() const { return std::sqrt(x * x + y * y); };
     BasePoint scale(double s) const { return BasePoint(s * x, s * y); };
 };
 
