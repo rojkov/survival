@@ -12,7 +12,7 @@
 
 class Viewport;
 
-typedef GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT> WorldGrid;
+using WorldGrid = GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT>;
 
 class World
 {
