@@ -58,7 +58,7 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     Size size = m_txt_rect.size();
     m_texture.reset(SDL_CreateTexture(m_renderer.get(), SDL_PIXELFORMAT_RGBA8888,
                                       SDL_TEXTUREACCESS_TARGET,
-                                      size.width(), size.height()));
+                                      size.width, size.height));
     assert(m_texture != nullptr);
     refresh_texture(viewport_rect);
 }
@@ -107,12 +107,12 @@ void World::refresh_texture(const Rect &viewport)
 
     int offset_x = m_txt_rect.offset().x, offset_y = m_txt_rect.offset().y;
 
-    for (int i = 0; i <= m_txt_rect.size().width()/16; i++) {
+    for (int i = 0; i <= m_txt_rect.size().width/16; i++) {
         int tile_x_pos = i + offset_x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j <= m_txt_rect.size().height()/16; j++) {
+        for (int j = 0; j <= m_txt_rect.size().height/16; j++) {
             int tile_y_pos = j + offset_y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;

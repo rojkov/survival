@@ -21,16 +21,12 @@ struct BasePoint {
 using Point = BasePoint<int>;
 using WorldPoint = BasePoint<double>;
 
-class Size {
-public:
-    Size(int width, int height) : m_width(width), m_height(height) {};
-    int width() const { return m_width; };
-    int height() const { return m_height; };
-    Size sum(const Size &size) const { return Size(m_width + size.m_width, m_height + size.m_height); };
+struct Size {
+    int width;
+    int height;
 
-private:
-    int m_width;
-    int m_height;
+    Size(int awidth, int aheight) : width(awidth), height(aheight) {};
+    Size sum(const Size &size) const { return Size(width + size.width, height + size.height); };
 };
 
 class Rect {
