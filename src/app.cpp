@@ -1,5 +1,6 @@
 #include "app.h"
 #include "world.h"
+#include "lifeform.h"
 #include "viewport.h"
 
 App::App()

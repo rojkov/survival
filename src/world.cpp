@@ -5,6 +5,7 @@
 #include <vector>
 #include "world.h"
 #include "terrain.h"
+#include "lifeform.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
 

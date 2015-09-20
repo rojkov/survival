@@ -2,7 +2,6 @@
 #define WORLD_H
 
 #include <memory>
-#include "lifeform.h"
 #include "geometry.h"
 #include "graphalg/gridgraph.h"
 
@@ -11,6 +10,7 @@
 
 class Viewport;
 class Terrain;
+class LifeForm;
 
 using WorldGrid = GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT>;
 
