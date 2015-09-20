@@ -24,7 +24,9 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
-    , m_txt_rect(Rect(viewport_rect.offset, viewport_rect.size.sum(Size(16*4, 16*4))))
+    , m_txt_rect(Rect(viewport_rect.x, viewport_rect.y,
+                      viewport_rect.width + 16*4,
+                      viewport_rect.height + 16*4))
 {
     unique_surf temp_surf(IMG_Load("tileset.png"), SDL_FreeSurface);
     assert(temp_surf != nullptr);
@@ -57,8 +59,8 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     // Create world texture
     m_texture.reset(SDL_CreateTexture(m_renderer.get(), SDL_PIXELFORMAT_RGBA8888,
                                       SDL_TEXTUREACCESS_TARGET,
-                                      m_txt_rect.size.width,
-                                      m_txt_rect.size.height));
+                                      m_txt_rect.width,
+                                      m_txt_rect.height));
     assert(m_texture != nullptr);
     refresh_texture(viewport_rect);
 }
@@ -99,24 +101,23 @@ void World::refresh_texture(const Rect &viewport)
     SDL_RenderClear(m_renderer.get());
 
     int padding = 16 * 2;
-    m_txt_rect = Rect(Point(viewport.offset.sum(Point(-padding, -padding))),
-                            Size(viewport.size.sum(Size(2*padding, 2*padding))))
-                      .move(Point(-1 * (viewport.offset.x % 16),
-                                  -1 * (viewport.offset.y % 16)))
-                      .move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
+    m_txt_rect = viewport.enlarge(padding)
+                         .move(Point(-1 * (viewport.x % 16),
+                                     -1 * (viewport.y % 16)))
+                         .move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
 
-    for (int i = 0; i <= m_txt_rect.size.width/16; i++) {
-        int tile_x_pos = i + m_txt_rect.offset.x/16;
+    for (int i = 0; i <= m_txt_rect.width/16; i++) {
+        int tile_x_pos = i + m_txt_rect.x/16;
         if (tile_x_pos >= WORLD_WIDTH || tile_x_pos < 0) {
             continue;
         }
-        for (int j = 0; j <= m_txt_rect.size.height/16; j++) {
-            int tile_y_pos = j + m_txt_rect.offset.y/16;
+        for (int j = 0; j <= m_txt_rect.height/16; j++) {
+            int tile_y_pos = j + m_txt_rect.y/16;
             if (tile_y_pos >= WORLD_HEIGHT || tile_y_pos < 0) {
                 continue;
             }
-            SDL_Rect rect {i * 16 - (m_txt_rect.offset.x % 16),
-                           j * 16 - (m_txt_rect.offset.y % 16), 16, 16};
+            SDL_Rect rect {i * 16 - (m_txt_rect.x % 16),
+                           j * 16 - (m_txt_rect.y % 16), 16, 16};
             SDL_RenderCopy(m_renderer.get(), m_tiles.at(tile_x_pos, tile_y_pos)->get_texture(),
                            nullptr, &rect);
         }

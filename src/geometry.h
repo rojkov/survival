@@ -10,7 +10,7 @@ struct BasePoint {
     T x;
     T y;
 
-    BasePoint(const T& ax, const T& ay) : x(ax), y(ay) {};
+    BasePoint(const T& a_x, const T& a_y) : x(a_x), y(a_y) {};
     BasePoint sum(const BasePoint& delta) const { return BasePoint(x + delta.x, y + delta.y); };
     BasePoint substruct(const BasePoint& other) const { return BasePoint(x - other.x, y - other.y); };
 
@@ -21,20 +21,10 @@ struct BasePoint {
 using Point = BasePoint<int>;
 using WorldPoint = BasePoint<double>;
 
-struct Size {
-    int width;
-    int height;
-
-    Size(int awidth, int aheight) : width(awidth), height(aheight) {};
-    Size sum(const Size &size) const { return Size(width + size.width, height + size.height); };
-};
-
 struct Rect {
-    Point offset;
-    Size size;
+    int x, y, width, height;
 
-    Rect(const int x, const int y, int width, int height) : offset(x, y), size(width, height) {};
-    Rect(Point aoffset, Size asize) : offset(aoffset), size(asize) {};
+    Rect(const int a_x, const int a_y, int a_width, int a_height) : x(a_x), y(a_y), width(a_width), height(a_height) {};
 
     bool is_inside(const Rect &rect) const;
     bool contains(const Point &point) const;
@@ -43,6 +33,7 @@ struct Rect {
 
     const Rect move(const Point &delta) const;
     const Rect move_inside(const Rect &big_rect) const;
+    const Rect enlarge(const int &padding) const;
 };
 
 #endif // GEOMETRY_H

@@ -3,8 +3,8 @@
 
 bool Rect::contains(const Point &point) const
 {
-    if (point.x >= offset.x && point.x <= offset.x + size.width &&
-        point.y >= offset.y && point.y <= offset.y + size.height)
+    if (point.x >= x && point.x <= x + width &&
+        point.y >= y && point.y <= y + height)
     {
         return true;
     } else {
@@ -14,72 +14,68 @@ bool Rect::contains(const Point &point) const
 
 bool Rect::is_inside(const Rect &rect) const
 {
-    int offset_x = offset.x, offset_y = offset.y,
-        rect_offset_x = rect.offset.x, rect_offset_y = rect.offset.y;
-    return offset_x >= rect_offset_x &&
-           offset_y >= rect_offset_y &&
-           offset_x + size.width <= rect_offset_x + rect.size.width &&
-           offset_y + size.height <= rect_offset_y + rect.size.height;
+    return x >= rect.x &&
+           y >= rect.y &&
+           x + width <= rect.x + rect.width &&
+           y + height <= rect.y + rect.height;
 }
 
 Rect Rect::get_relative_intersection(const Rect &rect) const
 {
     // make the intersection relative to this Rect
-    int x = rect.offset.x - offset.x;
-    int y = rect.offset.y - offset.y;
+    int new_x = rect.x - x;
+    int new_y = rect.y - y;
 
-    int width = rect.size.width;
-    int height = rect.size.height;
-    if (x < 0) {
-        width += x;
-        x = 0;
+    int new_width = rect.width;
+    int new_height = rect.height;
+    if (new_x < 0) {
+        new_width += new_x;
+        new_x = 0;
     }
-    if (y < 0) {
-        height += y;
-        y = 0;
+    if (new_y < 0) {
+        new_height += new_y;
+        new_y = 0;
     }
-    if (width > size.width) {
-        width = size.width;
+    if (new_width > width) {
+        new_width = width;
     }
-    if (height > size.height) {
-        height = size.height;
+    if (new_height > height) {
+        new_height = height;
     }
-    return Rect(x, y, width, height);
+    return Rect(new_x, new_y, new_width, new_height);
 }
 
 SDL_Rect Rect::as_sdl_rect() const
 {
-    SDL_Rect sdlrect {
-        offset.x,
-        offset.y,
-        size.width,
-        size.height
-    };
+    SDL_Rect sdlrect {x, y, width, height};
 
     return sdlrect;
 }
 
 const Rect Rect::move(const Point &delta) const
 {
-    return Rect(offset.sum(delta), size);
+    return Rect(x + delta.x, y + delta.y, width, height);
 }
 
 const Rect Rect::move_inside(const Rect &big_rect) const
 {
-    int x(offset.x), y(offset.y);
+    int new_x(x), new_y(y);
 
-    if (offset.x < big_rect.offset.x) {
-        x = big_rect.offset.x;
-    } else if (offset.x + size.width >
-               big_rect.offset.x + big_rect.size.width) {
-        x = big_rect.size.width - size.width;
+    if (x < big_rect.x) {
+        new_x = big_rect.x;
+    } else if (x + width > big_rect.x + big_rect.width) {
+        new_x = big_rect.width - width;
     }
 
-    if (offset.y < big_rect.offset.y) {
-        y = big_rect.offset.y;
-    } else if (offset.y + size.height >
-               big_rect.offset.y + big_rect.size.height) {
-        y = big_rect.size.height - size.height;
+    if (y < big_rect.y) {
+        new_y = big_rect.y;
+    } else if (y + height > big_rect.y + big_rect.height) {
+        new_y = big_rect.height - height;
     }
-    return Rect(Point(x, y), size);
+    return Rect(new_x, new_y, width, height);
+}
+
+const Rect Rect::enlarge(const int &padding) const
+{
+    return Rect(x - padding, y - padding, width + 2*padding, height + 2*padding);
 }
