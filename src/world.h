@@ -3,7 +3,6 @@
 
 #include <memory>
 #include "lifeform.h"
-#include "terrain.h"
 #include "geometry.h"
 #include "graphalg/gridgraph.h"
 
@@ -11,6 +10,7 @@
 #define WORLD_HEIGHT 50
 
 class Viewport;
+class Terrain;
 
 using WorldGrid = GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT>;
 
@@ -18,6 +18,7 @@ class World
 {
 public:
     World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect);
+    virtual ~World();
 
     std::vector<Point> get_path(const WorldPoint &start, const WorldPoint &end) const;
 

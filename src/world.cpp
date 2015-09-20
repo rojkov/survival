@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "world.h"
+#include "terrain.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
 
@@ -64,6 +65,8 @@ World::World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect)
     assert(m_texture != nullptr);
     refresh_texture(viewport_rect);
 }
+
+World::~World() {}
 
 std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &end) const
 {
