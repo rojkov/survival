@@ -17,7 +17,7 @@ using WorldGrid = GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT>;
 class World
 {
 public:
-    World(std::shared_ptr<SDL_Renderer> renderer, const Rect &viewport_rect);
+    World(std::shared_ptr<SDL_Renderer> renderer);
     virtual ~World();
 
     std::vector<Point> get_path(const WorldPoint &start, const WorldPoint &end) const;
@@ -26,14 +26,15 @@ public:
 
     void handle_event(const SDL_Event &event);
     void update(uint32_t elapsed);
-    void render(const Rect &viewport);
+    void render();
 
 private:
 
-    void refresh_texture(const Rect &viewport);
+    void refresh_texture();
     std::vector<Point> as_world_path(const std::vector<GridLocation> &path) const;
 
     std::shared_ptr<SDL_Renderer> m_renderer;
+    std::shared_ptr<Viewport> m_viewport;
     std::vector<std::shared_ptr<LifeForm> > m_lifeforms;
     std::unique_ptr<Terrain> m_grass_terrain;
     std::unique_ptr<Terrain> m_water_terrain;

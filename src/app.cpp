@@ -1,7 +1,6 @@
 #include "app.h"
 #include "world.h"
 #include "lifeform.h"
-#include "viewport.h"
 
 App::App()
     : m_win(nullptr, SDL_DestroyWindow)
@@ -37,8 +36,7 @@ int App::execute()
         return -1;
     }
 
-    Viewport viewport(Rect(0, 0, 640, 480));
-    std::shared_ptr<World> world(std::make_shared<World>(m_renderer, viewport.get_rect()));
+    std::shared_ptr<World> world(std::make_shared<World>(m_renderer));
     world->add_entity(std::make_shared<LifeForm>(world, 50, 50));
     world->add_entity(std::make_shared<LifeForm>(world, 150, 200));
     bool done(false);
@@ -57,21 +55,10 @@ int App::execute()
             }
         }
 
-        const uint8_t* current_key_states = SDL_GetKeyboardState(nullptr);
-        if (current_key_states[SDL_SCANCODE_UP]) {
-            viewport.move(Point(0, -1));
-        } else if (current_key_states[SDL_SCANCODE_DOWN]) {
-            viewport.move(Point(0, 1));
-        } else if (current_key_states[SDL_SCANCODE_LEFT]) {
-            viewport.move(Point(-1, 0));
-        } else if (current_key_states[SDL_SCANCODE_RIGHT]) {
-            viewport.move(Point(1, 0));
-        }
-
         world->handle_event(event);
 
         world->update(elapsed);
-        world->render(viewport.get_rect());
+        world->render();
     }
 
     return 0;
