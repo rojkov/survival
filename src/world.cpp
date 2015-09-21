@@ -78,6 +78,11 @@ std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &en
     return wpath;
 }
 
+const Rect World::get_viewport() const
+{
+    return m_viewport->get_rect();
+}
+
 void World::add_entity(std::shared_ptr<LifeForm> entity)
 {
     m_lifeforms.push_back(entity);

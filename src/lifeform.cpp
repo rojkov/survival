@@ -68,7 +68,18 @@ void LifeForm::update(uint32_t elapsed)
 
 void LifeForm::render(SDL_Renderer* renderer)
 {
-    SDL_Rect rect {(int)round(m_pos_x) - 8/2, (int)round(m_pos_y) - 8/2, 8, 8};
+    auto world = m_world.lock();
+    if (!world) {
+        return;
+    }
+
+    const Rect body((int)round(m_pos_x) - 8/2, (int)round(m_pos_y) - 8/2, 8, 8);
+    const Rect viewport(world->get_viewport());
+    if (!body.is_inside(viewport.enlarge(8))) {
+        return;
+    }
+
+    SDL_Rect rect(body.move(Point(-1 * viewport.x, -1 * viewport.y)).as_sdl_rect());
     SDL_SetRenderDrawColor(renderer, 255, 255, m_focused ? 0 : 255, 255);
     SDL_RenderFillRect(renderer, &rect);
 }
