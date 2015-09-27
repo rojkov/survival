@@ -166,8 +166,8 @@ std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path) c
                 result.emplace_back(pos_x * 16 - 8/2,
                                     pos_y * 16 + 8/2);
             } else if (dir == 4) {
-                result.emplace_back(current_x * 16 + 8/2,
-                                    pos_y * 16 + 8/2);
+                result.emplace_back(current_x * 16 + 16 - 8/2,
+                                    (pos_y + 1) * 16 - 8/2);
             }
             dir = 1;
         } else if (pos_x == current_x && pos_y > current_y && dir != 2) {
@@ -175,17 +175,17 @@ std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path) c
                 result.emplace_back(pos_x * 16 + 8/2,
                                     pos_y * 16 - 8/2);
             } else if (dir == 3) {
-                result.emplace_back(pos_x * 16 - 8/2,
+                result.emplace_back((pos_x + 1) * 16 - 8/2,
                                     pos_y * 16 - 8/2);
             }
             dir = 2;
         } else if (pos_y == current_y && pos_x < current_x && dir != 3) {
             if (dir == 2) {
-                result.emplace_back(current_x * 16 - 8/2,
+                result.emplace_back(current_x * 16 + 8/2,
                                     pos_y * 16 + 8/2);
             } else if (dir == 4) {
                 result.emplace_back(current_x * 16 + 8/2,
-                                    pos_y * 16 - 8/2);
+                                    (pos_y + 1) * 16 - 8/2);
             }
             dir = 3;
         } else if (pos_x == current_x && pos_y < current_y && dir != 4) {
@@ -193,8 +193,8 @@ std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path) c
                 result.emplace_back(pos_x * 16 + 8/2,
                                     current_y * 16 + 8/2);
             } else if (dir == 3) {
-                result.emplace_back(pos_x * 16 - 8/2,
-                                    current_y * 16 - 8/2);
+                result.emplace_back((pos_x + 1) * 16 - 8/2,
+                                    current_y * 16 + 8/2);
             }
             dir = 4;
         } else {
