@@ -42,5 +42,39 @@
                 '<!@(<(pkg-config) --libs-only-l SDL2_image)'
             ],
         },
+        {
+            'target_name': 'tst_geometry',
+            'type': 'executable',
+            'sources': [
+                'tests/tst_geometry/tst_geometry.cpp',
+                'src/geometry.cpp',
+                'src/geometry.h',
+            ],
+            'include_dirs': [
+                'src'
+            ],
+            'dependencies': [
+                'gtest'
+            ],
+            'cflags': [
+                '<!@(<(pkg-config) --cflags sdl2)',
+                '-std=c++11',
+            ],
+            'libraries': [
+                '<!@(<(pkg-config) --libs-only-l sdl2)',
+                '-pthread'
+            ]
+        },
+        {
+            'target_name': 'gtest',
+            'type': 'static_library',
+            'sources': [
+                'gtest-1.7.0/src/gtest-all.cc',
+            ],
+            'include_dirs': [
+                'gtest-1.7.0',
+                'gtest-1.7.0/include'
+            ]
+        }
     ],
 }
