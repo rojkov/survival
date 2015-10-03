@@ -1,4 +1,21 @@
 {
+    'target_defaults': {
+        'default_configuration': 'Release',
+        'configurations': {
+            'Release': {},
+            'Coverage': {
+                'cflags': [
+                    '-fprofile-arcs',
+                    '-ftest-coverage',
+                    '-O0'
+                ],
+                'ldflags': [
+                    '-lgcov',
+                    '-coverage'
+                ]
+            }
+        }
+    },
     'variables': {
         'pkg-config': 'pkg-config',
     },
@@ -71,6 +88,11 @@
             'type': 'static_library',
             'sources': [
                 'gtest-1.7.0/src/gtest-all.cc',
+            ],
+            'cflags!': [ # Don't do coverage for gtest's code
+                '-fprofile-arcs',
+                '-ftest-coverage',
+                '-O0'
             ],
             'include_dirs': [
                 'gtest-1.7.0',
