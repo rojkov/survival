@@ -59,10 +59,11 @@
             'cflags': [
                 '<!@(<(pkg-config) --cflags sdl2)',
                 '-std=c++11',
+                '-pedantic',
+                '-g',
             ],
             'libraries': [
                 '<!@(<(pkg-config) --libs-only-l sdl2)',
-                '-pthread'
             ]
         },
         {
@@ -74,7 +75,12 @@
             'include_dirs': [
                 'gtest-1.7.0',
                 'gtest-1.7.0/include'
-            ]
+            ],
+            'direct_dependent_settings': {
+                'libraries': [
+                    '-pthread'
+                ]
+            }
         }
     ],
 }
