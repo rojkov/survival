@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <algorithm>
+#include <cmath>
 
 struct SDL_Rect;
 
