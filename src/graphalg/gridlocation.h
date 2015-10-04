@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-typedef std::tuple<int, int> GridLocation;
+using GridLocation = std::tuple<int, int>;
 
 namespace std {
 template <>

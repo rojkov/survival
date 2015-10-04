@@ -12,7 +12,7 @@
 static uint32_t g_last_ticks = 0;
 static int g_fps = 0;
 
-typedef std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> unique_surf;
+using unique_surf = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>;
 
 inline int heuristic(GridLocation a, GridLocation b) {
     int x1, y1, x2, y2;

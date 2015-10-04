@@ -13,7 +13,7 @@ template <typename Node_T, size_t width, size_t height>
 class GridGraph
 {
 public:
-    typedef GridLocation Node;
+    using Node = GridLocation;
 
     void load(std::string mapfile_path, std::function<Node_T*(std::string)> get_node_instance) {
         std::ifstream mapFile(mapfile_path);
