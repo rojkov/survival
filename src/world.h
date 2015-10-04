@@ -20,7 +20,8 @@ public:
     World(std::shared_ptr<SDL_Renderer> renderer);
     virtual ~World();
 
-    std::vector<Point> get_path(const WorldPoint &start, const WorldPoint &end) const;
+    std::vector<Point> get_path(const WorldPoint& start, const WorldPoint& end) const;
+    GridLocation location(const WorldPoint& pos) const;
     const Rect get_viewport() const;
 
     void add_entity(std::shared_ptr<LifeForm> entity);

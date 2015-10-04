@@ -3,8 +3,10 @@
 
 #include <memory>
 #include <queue>
+#include <unordered_set>
 #include "geometry.h"
 #include "commands/command.h"
+#include "graphalg/gridlocation.h"
 
 class World;
 class SDL_Renderer;
@@ -30,6 +32,7 @@ private:
     double m_pos_y;
     bool m_focused;
     std::queue<std::unique_ptr<Command> > m_commands;
+    std::unordered_set<GridLocation> m_visited_tiles;
 };
 
 #endif // LIFEFORM_H

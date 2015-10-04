@@ -70,12 +70,18 @@ World::~World() {}
 
 std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &end) const
 {
-    GridLocation current {(int)round(start.x)/16, (int)round(start.y)/16};
-    GridLocation goal {(int)round(end.x)/16, (int)round(end.y)/16};
+    const auto current(location(start));
+    const auto goal(location(end));
     std::function<int(GridLocation, GridLocation)> h_func = heuristic;
     auto path = a_star_search(m_tiles, current, goal, h_func);
     auto wpath = as_world_path(path);
     return wpath;
+}
+
+GridLocation World::location(const WorldPoint& pos) const
+{
+    GridLocation location {(int)round(pos.x)/16, (int)round(pos.y)/16};
+    return location;
 }
 
 const Rect World::get_viewport() const
