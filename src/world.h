@@ -10,9 +10,10 @@
 
 class Viewport;
 class Terrain;
+class Tile;
 class LifeForm;
 
-using WorldGrid = GridGraph<Terrain, WORLD_WIDTH, WORLD_HEIGHT>;
+using WorldGrid = GridGraph<Tile, WORLD_WIDTH, WORLD_HEIGHT>;
 
 class World
 {

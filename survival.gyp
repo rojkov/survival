@@ -33,6 +33,8 @@
                 'src/lifeform.h',
                 'src/terrain.cpp',
                 'src/terrain.h',
+                'src/tile.cpp',
+                'src/tile.h',
                 'src/viewport.cpp',
                 'src/viewport.h',
                 'src/geometry.cpp',

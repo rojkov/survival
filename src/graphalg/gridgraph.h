@@ -15,7 +15,7 @@ class GridGraph
 public:
     using Node = GridLocation;
 
-    void load(std::string mapfile_path, std::function<Node_T*(std::string)> get_node_instance) {
+    void load(std::string mapfile_path, std::function<std::unique_ptr<Node_T>(std::string)> get_node_instance) {
         std::ifstream mapFile(mapfile_path);
         std::string line;
 
@@ -35,7 +35,8 @@ public:
         }
     };
 
-    Node_T* at(int x, int y) const { return m_grid.at(y * height + x); };
+    Node_T* at(int x, int y) const { return m_grid.at(y * height + x).get(); };
+
     std::vector<GridLocation> neighbors(GridLocation loc) const {
         int x, y, dx, dy;
         std::tie(x, y) = loc;
@@ -72,7 +73,7 @@ private:
         return m_grid.at(y * height + x)->passable();
     };
 
-    std::array<Node_T*, width * height> m_grid;
+    std::array<std::unique_ptr<Node_T>, width * height> m_grid;
     static std::array<GridLocation, 4> DIRS;
 };
 

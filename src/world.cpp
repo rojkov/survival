@@ -5,6 +5,7 @@
 #include <vector>
 #include "world.h"
 #include "terrain.h"
+#include "tile.h"
 #include "lifeform.h"
 #include "viewport.h"
 #include "graphalg/a_star_search.h"
@@ -46,12 +47,16 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     m_grass_terrain.reset(new Terrain(Terrain::GRASS, SDL_CreateTextureFromSurface(m_renderer.get(), grass_surf.get())));
     m_water_terrain.reset(new Terrain(Terrain::WATER, SDL_CreateTextureFromSurface(m_renderer.get(), water_surf.get())));
 
-    m_tiles.load("world.map", [this](std::string token) -> Terrain* {
+    m_tiles.load("world.map", [this](std::string token) -> std::unique_ptr<Tile> {
             switch (std::stoi(token)) {
-            case Terrain::GRASS:
-                return m_grass_terrain.get();
-            case Terrain::WATER:
-                return m_water_terrain.get();
+            case Terrain::GRASS: {
+                std::unique_ptr<Tile> grass_tile(new Tile(m_grass_terrain.get()));
+                return grass_tile;
+            }
+            case Terrain::WATER: {
+                std::unique_ptr<Tile> water_tile(new Tile(m_water_terrain.get()));
+                return water_tile;
+            }
             default:
                 assert(false);
             }
@@ -144,7 +149,7 @@ void World::refresh_texture()
             }
             SDL_Rect rect {i * 16 - (m_txt_rect.x % 16),
                            j * 16 - (m_txt_rect.y % 16), 16, 16};
-            SDL_RenderCopy(m_renderer.get(), m_tiles.at(tile_x_pos, tile_y_pos)->get_texture(),
+            SDL_RenderCopy(m_renderer.get(), m_tiles.at(tile_x_pos, tile_y_pos)->terrain()->get_texture(),
                            nullptr, &rect);
         }
     }
