@@ -15,6 +15,8 @@ public:
     uint32_t region() const;
     void set_region(uint32_t reg);
 
+    bool is_same_type(const Tile& other) const;
+
 private:
     Terrain* const m_terrain;
     uint32_t m_region;

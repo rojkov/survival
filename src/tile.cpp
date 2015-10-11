@@ -30,3 +30,7 @@ void Tile::set_region(uint32_t reg)
     m_region = reg;
 }
 
+bool Tile::is_same_type(const Tile& other) const
+{
+    return m_terrain == other.m_terrain;
+}
