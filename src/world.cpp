@@ -77,10 +77,20 @@ std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &en
 {
     const auto current(location(start));
     const auto goal(location(end));
-    std::function<int(GridLocation, GridLocation)> h_func = heuristic;
-    auto path = a_star_search(m_tiles, current, goal, h_func);
-    auto wpath = as_world_path(path);
-    return wpath;
+
+    int current_x, current_y, goal_x, goal_y;
+    std::tie(current_x, current_y) = current;
+    std::tie(goal_x, goal_y) = goal;
+    if (m_tiles.at(current_x, current_y)->region() ==
+            m_tiles.at(goal_x, goal_y)->region()) {
+        std::function<int(GridLocation, GridLocation)> h_func = heuristic;
+        auto path = a_star_search(m_tiles, current, goal, h_func);
+        auto wpath = as_world_path(path);
+        return wpath;
+    } else {
+        std::vector<Point> empty_path;
+        return empty_path;
+    }
 }
 
 GridLocation World::location(const WorldPoint& pos) const
@@ -151,19 +161,6 @@ void World::refresh_texture()
                            j * 16 - (m_txt_rect.y % 16), 16, 16};
             SDL_RenderCopy(m_renderer.get(), m_tiles.at(tile_x_pos, tile_y_pos)->terrain()->get_texture(),
                            nullptr, &rect);
-            // TODO: Regions. remove it
-            auto reg = m_tiles.at(tile_x_pos, tile_y_pos)->region();
-            if (reg == 1) {
-                SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 255, 255);
-            } else if (reg == 2) {
-                SDL_SetRenderDrawColor(m_renderer.get(), 255, 255, 255, 255);
-            } else {
-                SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
-            }
-            SDL_Rect regrect {i * 16 - (m_txt_rect.x % 16),
-                              j * 16 - (m_txt_rect.y % 16), 3, 3};
-            SDL_RenderFillRect(m_renderer.get(), &regrect);
-            /////////////////////////////
         }
     }
 

@@ -38,7 +38,7 @@ int App::execute()
 
     std::shared_ptr<World> world(std::make_shared<World>(m_renderer));
     world->add_entity(std::make_shared<LifeForm>(world, 50, 50));
-    world->add_entity(std::make_shared<LifeForm>(world, 150, 200));
+    world->add_entity(std::make_shared<LifeForm>(world, 150, 180));
     bool done(false);
     SDL_Event event;
     uint32_t previous(SDL_GetTicks());
