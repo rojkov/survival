@@ -29,6 +29,8 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
     , m_txt_rect(Rect(0, 0, 640 + 16*4, 480 + 16*4))
+    , m_selection_rect(0, 0, 0, 0)
+    , m_mouse_down(false)
 {
     unique_surf temp_surf(IMG_Load("tileset.png"), SDL_FreeSurface);
     assert(temp_surf != nullptr);
@@ -120,6 +122,65 @@ void World::handle_event(const SDL_Event &event)
         m_viewport->move(Point(-1, 0));
     } else if (current_key_states[SDL_SCANCODE_RIGHT]) {
         m_viewport->move(Point(1, 0));
+    }
+
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            Rect vrect = m_viewport->get_rect();
+            m_selection_rect.x = event.button.x + vrect.x;
+            m_selection_rect.y = event.button.y + vrect.y;
+            m_mouse_down = true;
+        }
+    } else if (event.type == SDL_MOUSEBUTTONUP) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            // Calculate tile set to patrol by lifeforms
+            if (m_selection_rect.width > 0 && m_selection_rect.height > 0) {
+                std::unordered_set<GridLocation> patrol_set;
+                for (int x = m_selection_rect.x / 16;
+                        x <= (m_selection_rect.x + m_selection_rect.width) / 16;
+                        x++) {
+                    for (int y = m_selection_rect.y / 16;
+                            y <= (m_selection_rect.y + m_selection_rect.height) / 16;
+                            y++) {
+                        GridLocation loc {x, y};
+                        patrol_set.insert(loc);
+                    }
+                }
+                for (auto entity : m_lifeforms) {
+                    int x, y;
+                    std::tie(x, y) = location(entity->get_pos());
+                    auto reg = m_tiles.at(x, y)->region();
+                    std::unordered_set<GridLocation> pset;
+                    for (auto loc : patrol_set) {
+                        int x, y;
+                        std::tie(x, y) = loc;
+                        if (m_tiles.at(x, y)->region() == reg) {
+                            pset.insert(loc);
+                        }
+                    }
+                    if (!pset.empty()) {
+                        entity->patrol(pset);
+                    }
+                }
+            }
+
+            // Reset selection state
+            m_selection_rect.width = 0;
+            m_selection_rect.height = 0;
+            m_mouse_down = false;
+        }
+    } else if (event.type == SDL_MOUSEMOTION) {
+        if (m_mouse_down) {
+            Rect vrect = m_viewport->get_rect();
+            int diff_x(event.motion.x + vrect.x - m_selection_rect.x);
+            int diff_y(event.motion.y + vrect.y - m_selection_rect.y);
+            if (diff_x > 0) {
+                m_selection_rect.width = diff_x;
+            }
+            if (diff_y > 0) {
+                m_selection_rect.height = diff_y;
+            }
+        }
     }
 
     for (auto entity : m_lifeforms) {
@@ -245,6 +306,14 @@ void World::render()
     for (auto entity : m_lifeforms) {
         entity->render(m_renderer.get());
     }
+
+    if (m_selection_rect.width > 0 && m_selection_rect.height > 0) {
+        Rect vrect = m_viewport->get_rect();
+        SDL_Rect rect = m_selection_rect.move(Point(-1 * vrect.x, -1 * vrect.y)).as_sdl_rect();
+        SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 255);
+        SDL_RenderDrawRect(m_renderer.get(), &rect);
+    }
+
     SDL_RenderPresent(m_renderer.get());
 
     // Calculate FPS

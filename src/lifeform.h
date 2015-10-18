@@ -21,6 +21,7 @@ public:
 
     bool focused() const { return m_focused; };
     void set_focused (bool focused) { m_focused = focused; };
+    void patrol(const std::unordered_set<GridLocation>& locations);
 
     void handle_event(const SDL_Event &event);
     void update(uint32_t elapsed);
@@ -33,6 +34,7 @@ private:
     bool m_focused;
     std::queue<std::unique_ptr<Command> > m_commands;
     std::unordered_set<GridLocation> m_visited_tiles;
+    std::unordered_set<GridLocation> m_unvisited_tiles;
 };
 
 #endif // LIFEFORM_H

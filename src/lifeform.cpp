@@ -31,12 +31,23 @@ void LifeForm::move_to(const WorldPoint &new_position)
 
     auto old_loc = world->location(get_pos());
     auto new_loc = world->location(new_position);
-    if (new_loc != old_loc && !m_visited_tiles.count(new_loc)) {
+    if (new_loc != old_loc && m_unvisited_tiles.count(new_loc)) {
+        m_unvisited_tiles.erase(new_loc);
         m_visited_tiles.insert(new_loc);
     }
 
     m_pos_x = new_position.x;
     m_pos_y = new_position.y;
+}
+
+void LifeForm::patrol(const std::unordered_set<GridLocation>& locations)
+{
+    if (!m_focused) {
+        return;
+    }
+
+    m_visited_tiles.clear();
+    m_unvisited_tiles = locations;
 }
 
 void LifeForm::handle_event(const SDL_Event &event)
@@ -72,9 +83,26 @@ void LifeForm::handle_event(const SDL_Event &event)
 
 void LifeForm::update(uint32_t elapsed)
 {
+    if (m_commands.empty() && !m_unvisited_tiles.empty()) {
+        auto world = m_world.lock();
+        if (!world) {
+            return;
+        }
+        // Calculate new destination
+        auto it = m_unvisited_tiles.begin();
+        if (it != m_unvisited_tiles.end()) {
+            int x, y;
+            std::tie(x, y) = *it;
+            for (auto pt : world->get_path(get_pos(), WorldPoint(x * 16 + 8, y * 16 + 8))) {
+                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
+            }
+        }
+    }
+
     if (m_commands.empty()) {
         return;
     }
+
     auto command = m_commands.front().get();
     uint32_t timeleft = elapsed;
     while (timeleft) {

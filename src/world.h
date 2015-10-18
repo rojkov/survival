@@ -44,6 +44,8 @@ private:
     WorldGrid m_tiles;
     std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> m_texture;
     Rect m_txt_rect;
+    Rect m_selection_rect; // Selected region in world coordinates
+    bool m_mouse_down; // TODO: proper FSM is needed
 };
 
 #endif
