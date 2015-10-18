@@ -88,13 +88,11 @@ private:
             std::tie(x, y) = *it;
             auto first_node = m_grid.at(y * height + x).get();
             first_node->set_region(reg);
-            printf("Reg: %d {%d, %d}\n", reg, x, y);
             flood_fill(x, y, locs, first_node);
         }
     };
 
     void flood_fill(int32_t x, int32_t y, std::unordered_set<GridLocation>& locs, Node_T* first_node) {
-        printf("     {%d, %d}\n", x, y);
         auto reg(first_node->region());
 
         if (!m_grid.at(y * height + x)->is_same_type(*first_node)) {
