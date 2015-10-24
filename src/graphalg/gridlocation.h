@@ -16,4 +16,6 @@ struct hash<GridLocation> {
 };
 }
 
+double grid_distance(const GridLocation& loc1, const GridLocation& loc2);
+
 #endif // GRIDLOCATION_H

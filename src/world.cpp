@@ -101,6 +101,11 @@ GridLocation World::location(const WorldPoint& pos) const
     return location;
 }
 
+GridLocation World::closest(const GridLocation& loc, const std::unordered_set<GridLocation>& locs) const
+{
+    return m_tiles.closest(loc, locs);
+}
+
 const Rect World::get_viewport() const
 {
     return m_viewport->get_rect();

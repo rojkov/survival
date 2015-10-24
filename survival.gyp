@@ -41,6 +41,8 @@
                 'src/geometry.h',
                 'src/graphalg/a_star_search.h',
                 'src/graphalg/gridgraph.h',
+                'src/graphalg/gridlocation.h',
+                'src/graphalg/gridlocation.cpp',
                 'src/commands/command.h',
                 'src/commands/command.cpp',
                 'src/commands/move_command.h',

@@ -88,19 +88,17 @@ void LifeForm::update(uint32_t elapsed)
         if (!world) {
             return;
         }
-        // Calculate new destination
-        auto it = m_unvisited_tiles.begin();
-        if (it != m_unvisited_tiles.end()) {
 
-            if (*it == world->location(get_pos())) {
-                m_unvisited_tiles.erase(*it);
-                m_visited_tiles.insert(*it);
-            } else {
-                int x, y;
-                std::tie(x, y) = *it;
-                for (auto pt : world->get_path(get_pos(), WorldPoint(x * 16 + 8, y * 16 + 8))) {
-                    m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
-                }
+        auto current_tile = world->location(get_pos());
+        auto closest_tile = world->closest(current_tile, m_unvisited_tiles);
+        if (current_tile == closest_tile) {
+            m_unvisited_tiles.erase(current_tile);
+            m_visited_tiles.insert(current_tile);
+        } else {
+            int x, y;
+            std::tie(x, y) = closest_tile;
+            for (auto pt : world->get_path(get_pos(), WorldPoint(x * 16 + 8, y * 16 + 8))) {
+                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
             }
         }
     }

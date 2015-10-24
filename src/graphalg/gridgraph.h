@@ -16,7 +16,8 @@ class GridGraph
 public:
     using Node = GridLocation;
 
-    void load(std::string mapfile_path, std::function<std::unique_ptr<Node_T>(std::string)> get_node_instance) {
+    void load(std::string mapfile_path,
+              std::function<std::unique_ptr<Node_T>(std::string)> get_node_instance) {
         std::ifstream mapFile(mapfile_path);
         std::string line;
         std::unordered_set<GridLocation> locs;
@@ -64,6 +65,26 @@ public:
     // This is for future references in case I want
     // to implemenent different movement costs.
     inline int cost(GridLocation a, GridLocation b) const { return 1; };
+
+    GridLocation closest(const GridLocation& current, const std::unordered_set<GridLocation>& locs) const {
+
+        for (auto loc : neighbors(current)) {
+            if (locs.count(loc)) {
+                return loc;
+            }
+        }
+
+        std::vector<GridLocation> loc_vector;
+        for (auto loc : locs) {
+            loc_vector.push_back(loc);
+        }
+        std::sort(loc_vector.begin(), loc_vector.end(),
+                 [current](const GridLocation& loc1, const GridLocation& loc2) {
+            return grid_distance(current, loc1) < grid_distance(current, loc2);
+        });
+
+        return *loc_vector.begin();
+    };
 
 private:
     inline bool in_bounds(GridLocation loc) const {
