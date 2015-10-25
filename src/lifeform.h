@@ -4,11 +4,11 @@
 #include <memory>
 #include <queue>
 #include <unordered_set>
-#include "geometry.h"
 #include "commands/command.h"
 #include "graphalg/gridlocation.h"
 
 class World;
+struct WorldPosition;
 class SDL_Renderer;
 union SDL_Event;
 
@@ -16,8 +16,8 @@ class LifeForm {
 public:
     LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y);
 
-    WorldPoint get_pos() const;
-    void move_to(const WorldPoint &new_position);
+    WorldPosition get_pos() const;
+    void move_to(const WorldPosition &new_position);
 
     bool focused() const { return m_focused; };
     void set_focused (bool focused) { m_focused = focused; };

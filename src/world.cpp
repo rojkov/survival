@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string>
 #include <vector>
+#include "worldposition.h"
 #include "world.h"
 #include "terrain.h"
 #include "tile.h"
@@ -75,7 +76,7 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
 
 World::~World() {}
 
-std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &end) const
+std::vector<Point> World::get_path(const WorldPosition &start, const WorldPosition &end) const
 {
     const auto current(location(start));
     const auto goal(location(end));
@@ -95,7 +96,7 @@ std::vector<Point> World::get_path(const WorldPoint &start, const WorldPoint &en
     }
 }
 
-GridLocation World::location(const WorldPoint& pos) const
+GridLocation World::location(const WorldPosition& pos) const
 {
     GridLocation location {(int)round(pos.x)/16, (int)round(pos.y)/16};
     return location;

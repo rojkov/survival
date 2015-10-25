@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "lifeform.h"
 #include "world.h"
+#include "worldposition.h"
 #include "commands/move_command.h"
 
 LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
@@ -17,12 +18,12 @@ LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
     m_visited_tiles.insert(world_p->location(get_pos()));
 }
 
-WorldPoint LifeForm::get_pos() const
+WorldPosition LifeForm::get_pos() const
 {
-    return WorldPoint(m_pos_x, m_pos_y);
+    return WorldPosition(m_pos_x, m_pos_y);
 }
 
-void LifeForm::move_to(const WorldPoint &new_position)
+void LifeForm::move_to(const WorldPosition &new_position)
 {
     auto world = m_world.lock();
     if (!world) {
@@ -60,7 +61,7 @@ void LifeForm::handle_event(const SDL_Event &event)
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             const Rect viewport(world->get_viewport());
-            WorldPoint pos = get_pos();
+            WorldPosition pos = get_pos();
             Rect rect((int)round(pos.x) - 8/2, (int)round(pos.y) - 8/2, 8, 8);
             if (rect.contains(Point(event.button.x + viewport.x, event.button.y + viewport.y))) {
                 set_focused(true);
@@ -73,9 +74,9 @@ void LifeForm::handle_event(const SDL_Event &event)
                 m_commands.pop();
             }
             const Rect viewport(world->get_viewport());
-            for (auto pt : world->get_path(get_pos(), WorldPoint(event.button.x + viewport.x,
+            for (auto pt : world->get_path(get_pos(), WorldPosition(event.button.x + viewport.x,
                                                                  event.button.y + viewport.y))) {
-                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
+                m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
             }
         }
     }
@@ -97,8 +98,8 @@ void LifeForm::update(uint32_t elapsed)
         } else {
             int x, y;
             std::tie(x, y) = closest_tile;
-            for (auto pt : world->get_path(get_pos(), WorldPoint(x * 16 + 8, y * 16 + 8))) {
-                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
+            for (auto pt : world->get_path(get_pos(), WorldPosition(x * 16 + 8, y * 16 + 8))) {
+                m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
             }
         }
     }

@@ -12,6 +12,7 @@ class Viewport;
 class Terrain;
 class Tile;
 class LifeForm;
+struct WorldPosition;
 
 using WorldGrid = GridGraph<Tile, WORLD_WIDTH, WORLD_HEIGHT>;
 
@@ -21,8 +22,8 @@ public:
     World(std::shared_ptr<SDL_Renderer> renderer);
     virtual ~World();
 
-    std::vector<Point> get_path(const WorldPoint& start, const WorldPoint& end) const;
-    GridLocation location(const WorldPoint& pos) const;
+    std::vector<Point> get_path(const WorldPosition& start, const WorldPosition& end) const;
+    GridLocation location(const WorldPosition& pos) const;
     GridLocation closest(const GridLocation& loc, const std::unordered_set<GridLocation>& locs) const;
     const Rect get_viewport() const;
 

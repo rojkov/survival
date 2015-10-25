@@ -19,7 +19,6 @@ struct BasePoint {
 };
 
 using Point = BasePoint<int>;
-using WorldPoint = BasePoint<double>;
 
 struct Rect {
     int x, y, width, height;
