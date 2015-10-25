@@ -39,8 +39,18 @@ struct Rect {
 namespace geom {
 
 template<typename Vector_T>
-Vector_T sum(const Vector_T& v1, const Vector_T& v2) {
-    return Vector_T(v1.x + v2.x, v1.y + v2.y);
+Vector_T sum(const Vector_T& first, const Vector_T& second) {
+    return Vector_T(first.x + second.x, first.y + second.y);
+}
+
+template<typename Vector_T>
+Vector_T substruct(const Vector_T& first, const Vector_T& second) {
+    return Vector_T(first.x - second.x, first.y - second.y);
+}
+
+template<typename Vector_T>
+Vector_T scale(const Vector_T& vector, const double& s) {
+    return Vector_T(vector.x * s, vector.y * s);
 }
 
 }
