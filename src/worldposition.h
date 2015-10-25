@@ -3,7 +3,8 @@
 
 #include "geometry.h"
 
-struct WorldPosition : BasePoint<double> {
+struct WorldPosition : BasePoint<double>
+{
     WorldPosition(const double& a_x, const double& a_y);
 };
 
