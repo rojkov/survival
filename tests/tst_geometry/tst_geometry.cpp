@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
-#include <SDL.h>
-#include "geometry.h"
+#include "worldposition.h"
 
-TEST(GeometryTest, CanCalculateSomething) {
-    Rect rect {1, 1, 1,1};
-    rect.as_sdl_rect();
+TEST(VectorGeomtryTest, SumVectors) {
+    WorldPosition wp1(3.0, 7.0);
+    WorldPosition wp2(2.0, 8.0);
+    auto result = geom::sum(wp1, wp2);
+    EXPECT_EQ(5.0, result.x);
+    EXPECT_EQ(15.0, result.y);
 }
 
 int main(int argc, char** argv) {

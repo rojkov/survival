@@ -36,4 +36,13 @@ struct Rect {
     const Rect enlarge(const int &padding) const;
 };
 
+namespace geom {
+
+template<typename Vector_T>
+Vector_T sum(const Vector_T& v1, const Vector_T& v2) {
+    return Vector_T(v1.x + v2.x, v1.y + v2.y);
+}
+
+}
+
 #endif // GEOMETRY_H
