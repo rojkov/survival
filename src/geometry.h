@@ -11,11 +11,8 @@ struct BasePoint {
     T y;
 
     BasePoint(const T& a_x, const T& a_y) : x(a_x), y(a_y) {};
-    BasePoint sum(const BasePoint& delta) const { return BasePoint(x + delta.x, y + delta.y); };
-    BasePoint substruct(const BasePoint& other) const { return BasePoint(x - other.x, y - other.y); };
 
     T abs() const { return std::sqrt(x * x + y * y); };
-    BasePoint scale(double s) const { return BasePoint(s * x, s * y); };
 };
 
 using Point = BasePoint<int>;
