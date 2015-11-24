@@ -76,7 +76,7 @@ World::World(std::shared_ptr<SDL_Renderer> renderer)
 
 World::~World() {}
 
-std::vector<Point> World::get_path(const WorldPosition &start, const WorldPosition &end) const
+std::vector<WorldPoint> World::get_path(const WorldPosition &start, const WorldPosition &end) const
 {
     const auto current(location(start));
     const auto goal(location(end));
@@ -91,7 +91,7 @@ std::vector<Point> World::get_path(const WorldPosition &start, const WorldPositi
         auto wpath = as_world_path(path);
         return wpath;
     } else {
-        std::vector<Point> empty_path;
+        std::vector<WorldPoint> empty_path;
         return empty_path;
     }
 }
@@ -238,9 +238,9 @@ void World::refresh_texture()
     SDL_LogDebug(SDL_LOG_CATEGORY_RENDER, "vrect{%d, %d, %d, %d} m_txt_rect{%d, %d, %d, %d}", vrect.x, vrect.y, vrect.w, vrect.h, srect.x, srect.y, srect.w, srect.h);
 }
 
-std::vector<Point> World::as_world_path(const std::vector<GridLocation> &path) const
+std::vector<WorldPoint> World::as_world_path(const std::vector<GridLocation> &path) const
 {
-    std::vector<Point> result;
+    std::vector<WorldPoint> result;
     int current_x, current_y;
     int dir = 0; // 1 - right, 2 - down, 3 - left, 4 - up
     std::tie(current_x, current_y) = path.front();

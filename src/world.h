@@ -22,7 +22,7 @@ public:
     World(std::shared_ptr<SDL_Renderer> renderer);
     virtual ~World();
 
-    std::vector<Point> get_path(const WorldPosition& start, const WorldPosition& end) const;
+    std::vector<WorldPoint> get_path(const WorldPosition& start, const WorldPosition& end) const;
     GridLocation location(const WorldPosition& pos) const;
     GridLocation closest(const GridLocation& loc, const std::unordered_set<GridLocation>& locs) const;
     const Rect get_viewport() const;
@@ -36,7 +36,7 @@ public:
 private:
 
     void refresh_texture();
-    std::vector<Point> as_world_path(const std::vector<GridLocation> &path) const;
+    std::vector<WorldPoint> as_world_path(const std::vector<GridLocation> &path) const;
 
     std::shared_ptr<SDL_Renderer> m_renderer;
     std::shared_ptr<Viewport> m_viewport;
