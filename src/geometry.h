@@ -17,11 +17,6 @@ struct BasePoint {
 
 using Point = BasePoint<int>;
 
-struct WorldPoint : BasePoint<int>
-{
-    WorldPoint(const int& a_x, const int& a_y) : BasePoint<int>(a_x, a_y) {};
-};
-
 struct Rect {
     int x, y, width, height;
 
