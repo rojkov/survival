@@ -1,5 +1,4 @@
 #include "geometry.h"
-#include <SDL_rect.h>
 
 bool Rect::contains(const Point &point) const
 {
