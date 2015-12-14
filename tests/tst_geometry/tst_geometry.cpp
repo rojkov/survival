@@ -89,6 +89,16 @@ TEST(BaseRectTest, move_inside) {
     EXPECT_EQ(30, newRect2.height);
 }
 
+TEST(BaseRectTest, enlarge) {
+    BaseRect<int32_t, BasePoint<int32_t>> rect(5, 6, 18, 28);
+    auto newRect = geom::rect::enlarge(rect, 2);
+
+    EXPECT_EQ(3, newRect.x);
+    EXPECT_EQ(4, newRect.y);
+    EXPECT_EQ(22, newRect.width);
+    EXPECT_EQ(32, newRect.height);
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

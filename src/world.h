@@ -2,7 +2,8 @@
 #define WORLD_H
 
 #include <memory>
-#include "geometry.h"
+#include "worldpoint.h"
+#include "worldrect.h"
 #include "graphalg/gridgraph.h"
 
 #define WORLD_WIDTH 50
@@ -16,11 +17,6 @@ struct WorldPosition;
 
 using WorldGrid = GridGraph<Tile, WORLD_WIDTH, WORLD_HEIGHT>;
 
-struct WorldPoint : BasePoint<int32_t>
-{
-    WorldPoint(const int32_t& a_x, const int32_t& a_y) : BasePoint<int32_t>(a_x, a_y) {};
-};
-
 class World
 {
 public:
@@ -30,7 +26,8 @@ public:
     std::vector<WorldPoint> get_path(const WorldPosition& start, const WorldPosition& end) const;
     GridLocation location(const WorldPosition& pos) const;
     GridLocation closest(const GridLocation& loc, const std::unordered_set<GridLocation>& locs) const;
-    const Rect get_viewport() const;
+    const WorldRect get_viewport() const;
+    SDL_Rect to_sdl_rect(const WorldRect& rect) const;
 
     void add_entity(std::shared_ptr<LifeForm> entity);
 
@@ -50,8 +47,8 @@ private:
     std::unique_ptr<Terrain> m_water_terrain;
     WorldGrid m_tiles;
     std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> m_texture;
-    Rect m_txt_rect;
-    Rect m_selection_rect; // Selected region in world coordinates
+    WorldRect m_txt_rect;
+    WorldRect m_selection_rect; // Selected region in world coordinates
     bool m_mouse_down; // TODO: proper FSM is needed
 };
 

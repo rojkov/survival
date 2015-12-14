@@ -1,19 +1,34 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
-#include "geometry.h"
+#include "worldrect.h"
+
+struct WorldPoint;
+
+struct ScreenPoint : BasePoint<int32_t>
+{
+    ScreenPoint(const int32_t& a_x, const int32_t& a_y) : BasePoint<int32_t>(a_x, a_y) {};
+};
+
+struct ScreenRect : BaseRect<int32_t, ScreenPoint>
+{
+    ScreenRect(const int32_t& a_x, const int32_t& a_y,
+              const int32_t& a_width, const int32_t& a_height)
+        : BaseRect<int32_t, ScreenPoint>(a_x, a_y, a_width, a_height) {};
+};
 
 class Viewport
 {
 public:
-    Viewport(Rect rect);
+    Viewport(const WorldRect& rect);
 
-    const Rect get_rect() const;
+    const WorldRect get_rect() const;
+    const ScreenRect to_screen_rect(const WorldRect& rect) const;
 
-    void move(const Point &delta);
+    void move(const WorldPoint &delta);
 
 private:
-    Rect m_rect;
+    WorldRect m_rect;
 };
 
 #endif // VIEWPORT_H

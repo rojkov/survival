@@ -60,10 +60,10 @@ void LifeForm::handle_event(const SDL_Event &event)
 
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            const Rect viewport(world->get_viewport());
+            const WorldRect viewport(world->get_viewport());
             WorldPosition pos = get_pos();
-            Rect rect((int)round(pos.x) - 8/2, (int)round(pos.y) - 8/2, 8, 8);
-            if (rect.contains(Point(event.button.x + viewport.x, event.button.y + viewport.y))) {
+            WorldRect rect((int32_t)round(pos.x) - 8/2, (int32_t)round(pos.y) - 8/2, 8, 8);
+            if (rect.contains(WorldPoint(event.button.x + viewport.x, event.button.y + viewport.y))) {
                 set_focused(true);
             } else {
                 set_focused(false);
@@ -73,7 +73,7 @@ void LifeForm::handle_event(const SDL_Event &event)
             while (!m_commands.empty()) {
                 m_commands.pop();
             }
-            const Rect viewport(world->get_viewport());
+            const WorldRect viewport(world->get_viewport());
             for (auto pt : world->get_path(get_pos(), WorldPosition(event.button.x + viewport.x,
                                                                  event.button.y + viewport.y))) {
                 m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
@@ -128,7 +128,7 @@ void LifeForm::render(SDL_Renderer* renderer)
     if (!world) {
         return;
     }
-    const Rect viewport(world->get_viewport());
+    const WorldRect viewport(world->get_viewport());
 
     if (!m_visited_tiles.empty()) {
         SDL_BlendMode oldMode;
@@ -138,26 +138,26 @@ void LifeForm::render(SDL_Renderer* renderer)
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 30);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        const Rect bigger_view(viewport.enlarge(16));
+        const WorldRect bigger_view(geom::rect::enlarge(viewport, 16));
         for (auto tile : m_visited_tiles) {
             int x, y;
             std::tie(x, y) = tile;
-            const Rect tile_rect(x * 16, y * 16, 16, 16);
+            const WorldRect tile_rect(x * 16, y * 16, 16, 16);
             if (!tile_rect.is_inside(bigger_view)) {
                 continue;
             }
-            SDL_Rect rect(tile_rect.move(Point(-1 * viewport.x, -1 * viewport.y)).as_sdl_rect());
+            SDL_Rect rect(world->to_sdl_rect(tile_rect));
             SDL_RenderFillRect(renderer, &rect);
         }
         SDL_SetRenderDrawBlendMode(renderer, oldMode);
     }
 
-    const Rect body((int)round(m_pos_x) - 8/2, (int)round(m_pos_y) - 8/2, 8, 8);
-    if (!body.is_inside(viewport.enlarge(8))) {
+    const WorldRect body((int32_t)round(m_pos_x) - 8/2, (int32_t)round(m_pos_y) - 8/2, 8, 8);
+    if (!body.is_inside(geom::rect::enlarge(viewport, 8))) {
         return;
     }
 
-    SDL_Rect rect(body.move(Point(-1 * viewport.x, -1 * viewport.y)).as_sdl_rect());
+    SDL_Rect rect(world->to_sdl_rect(body));
     SDL_SetRenderDrawColor(renderer, 255, 255, m_focused ? 0 : 255, 255);
     SDL_RenderFillRect(renderer, &rect);
 }

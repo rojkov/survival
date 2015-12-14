@@ -149,6 +149,15 @@ const Rect_T move_inside(const Rect_T& rect, const Rect_T& big_rect)
     return Rect_T(new_x, new_y, rect.width, rect.height);
 }
 
+template<typename Rect_T>
+const Rect_T enlarge(const Rect_T& rect, const int32_t& padding)
+{
+    return Rect_T(rect.x - padding,
+                  rect.y - padding,
+                  rect.width + 2*padding,
+                  rect.height + 2*padding);
+}
+
 } // namespace rect
 
 } // namespace geom

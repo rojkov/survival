@@ -25,11 +25,11 @@ inline int heuristic(GridLocation a, GridLocation b) {
 
 World::World(std::shared_ptr<SDL_Renderer> renderer)
     : m_renderer(renderer)
-    , m_viewport(std::make_shared<Viewport>(Rect(0, 0, 640, 480)))
+    , m_viewport(std::make_shared<Viewport>(WorldRect(0, 0, 640, 480)))
     , m_grass_terrain(nullptr)
     , m_water_terrain(nullptr)
     , m_texture(nullptr, SDL_DestroyTexture)
-    , m_txt_rect(Rect(0, 0, 640 + 16*4, 480 + 16*4))
+    , m_txt_rect(0, 0, 640 + 16*4, 480 + 16*4)
     , m_selection_rect(0, 0, 0, 0)
     , m_mouse_down(false)
 {
@@ -107,9 +107,14 @@ GridLocation World::closest(const GridLocation& loc, const std::unordered_set<Gr
     return m_tiles.closest(loc, locs);
 }
 
-const Rect World::get_viewport() const
+const WorldRect World::get_viewport() const
 {
     return m_viewport->get_rect();
+}
+
+SDL_Rect World::to_sdl_rect(const WorldRect& rect) const
+{
+    return m_viewport->to_screen_rect(rect).as_sdl_rect();
 }
 
 void World::add_entity(std::shared_ptr<LifeForm> entity)
@@ -121,18 +126,18 @@ void World::handle_event(const SDL_Event &event)
 {
     const uint8_t* current_key_states = SDL_GetKeyboardState(nullptr);
     if (current_key_states[SDL_SCANCODE_UP]) {
-        m_viewport->move(Point(0, -1));
+        m_viewport->move(WorldPoint(0, -1));
     } else if (current_key_states[SDL_SCANCODE_DOWN]) {
-        m_viewport->move(Point(0, 1));
+        m_viewport->move(WorldPoint(0, 1));
     } else if (current_key_states[SDL_SCANCODE_LEFT]) {
-        m_viewport->move(Point(-1, 0));
+        m_viewport->move(WorldPoint(-1, 0));
     } else if (current_key_states[SDL_SCANCODE_RIGHT]) {
-        m_viewport->move(Point(1, 0));
+        m_viewport->move(WorldPoint(1, 0));
     }
 
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            Rect vrect = m_viewport->get_rect();
+            WorldRect vrect = m_viewport->get_rect();
             m_selection_rect.x = event.button.x + vrect.x;
             m_selection_rect.y = event.button.y + vrect.y;
             m_mouse_down = true;
@@ -177,7 +182,7 @@ void World::handle_event(const SDL_Event &event)
         }
     } else if (event.type == SDL_MOUSEMOTION) {
         if (m_mouse_down) {
-            Rect vrect = m_viewport->get_rect();
+            WorldRect vrect = m_viewport->get_rect();
             int diff_x(event.motion.x + vrect.x - m_selection_rect.x);
             int diff_y(event.motion.y + vrect.y - m_selection_rect.y);
             if (diff_x > 0) {
@@ -207,12 +212,16 @@ void World::refresh_texture()
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    Rect viewport(m_viewport->get_rect());
+    WorldRect viewport(m_viewport->get_rect());
     int padding = 16 * 2;
-    m_txt_rect = viewport.enlarge(padding)
-                         .move(Point(-1 * (viewport.x % 16),
-                                     -1 * (viewport.y % 16)))
-                         .move_inside(Rect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
+
+    m_txt_rect = geom::rect::move_inside(
+                     geom::rect::move_by(
+                         geom::rect::enlarge(
+                             viewport, padding),
+                         WorldPoint(-1 * (viewport.x % 16),
+                                    -1 * (viewport.y % 16))),
+                     WorldRect(0, 0, WORLD_WIDTH * 16, WORLD_HEIGHT * 16));
 
     for (int i = 0; i <= m_txt_rect.width/16; i++) {
         int tile_x_pos = i + m_txt_rect.x/16;
@@ -300,12 +309,12 @@ void World::render()
     SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 0, 255);
     SDL_RenderClear(m_renderer.get());
 
-    Rect viewport(m_viewport->get_rect());
+    WorldRect viewport(m_viewport->get_rect());
     if (!viewport.is_inside(m_txt_rect)) {
         refresh_texture();
     }
 
-    SDL_Rect rect  = m_txt_rect.get_relative_intersection(viewport).as_sdl_rect();
+    SDL_Rect rect  = geom::rect::relative_intersection(m_txt_rect, viewport).as_sdl_rect();
     SDL_RenderCopy(m_renderer.get(), m_texture.get(),
                    &rect, nullptr);
 
@@ -314,8 +323,8 @@ void World::render()
     }
 
     if (m_selection_rect.width > 0 && m_selection_rect.height > 0) {
-        Rect vrect = m_viewport->get_rect();
-        SDL_Rect rect = m_selection_rect.move(Point(-1 * vrect.x, -1 * vrect.y)).as_sdl_rect();
+        WorldRect vrect = m_viewport->get_rect();
+        SDL_Rect rect = geom::rect::move_by(m_selection_rect, WorldPoint(-1 * vrect.x, -1 * vrect.y)).as_sdl_rect();
         SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 255);
         SDL_RenderDrawRect(m_renderer.get(), &rect);
     }
