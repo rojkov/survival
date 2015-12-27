@@ -1,0 +1,10 @@
+#ifndef GAMECONSTANTS_H
+#define GAMECONSTANTS_H
+
+#define WORLD_WIDTH 50
+#define WORLD_HEIGHT 50
+
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
+
+#endif // GAMECONSTANTS_H

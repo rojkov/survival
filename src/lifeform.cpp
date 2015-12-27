@@ -1,7 +1,12 @@
 #include "SDL.h"
 #include "lifeform.h"
 #include "world.h"
+#include "worldposition.h"
 #include "commands/move_command.h"
+#include "gameconstants.h"
+
+const uint32_t LifeForm::width = 8;
+const uint32_t LifeForm::height = 8;
 
 LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
     : m_world(world)
@@ -17,12 +22,12 @@ LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
     m_visited_tiles.insert(world_p->location(get_pos()));
 }
 
-WorldPoint LifeForm::get_pos() const
+WorldPosition LifeForm::get_pos() const
 {
-    return WorldPoint(m_pos_x, m_pos_y);
+    return WorldPosition(m_pos_x, m_pos_y);
 }
 
-void LifeForm::move_to(const WorldPoint &new_position)
+void LifeForm::move_to(const WorldPosition &new_position)
 {
     auto world = m_world.lock();
     if (!world) {
@@ -59,10 +64,12 @@ void LifeForm::handle_event(const SDL_Event &event)
 
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            const Rect viewport(world->get_viewport());
-            WorldPoint pos = get_pos();
-            Rect rect((int)round(pos.x) - 8/2, (int)round(pos.y) - 8/2, 8, 8);
-            if (rect.contains(Point(event.button.x + viewport.x, event.button.y + viewport.y))) {
+            const WorldRect viewport(world->get_viewport());
+            WorldPosition pos = get_pos();
+            WorldRect rect((int32_t)round(pos.x) - width/2,
+                           (int32_t)round(pos.y) - height/2,
+                           width, height);
+            if (rect.contains(WorldPoint(event.button.x + viewport.x, event.button.y + viewport.y))) {
                 set_focused(true);
             } else {
                 set_focused(false);
@@ -72,10 +79,10 @@ void LifeForm::handle_event(const SDL_Event &event)
             while (!m_commands.empty()) {
                 m_commands.pop();
             }
-            const Rect viewport(world->get_viewport());
-            for (auto pt : world->get_path(get_pos(), WorldPoint(event.button.x + viewport.x,
+            const WorldRect viewport(world->get_viewport());
+            for (auto pt : world->get_path(get_pos(), WorldPosition(event.button.x + viewport.x,
                                                                  event.button.y + viewport.y))) {
-                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
+                m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
             }
         }
     }
@@ -97,8 +104,10 @@ void LifeForm::update(uint32_t elapsed)
         } else {
             int x, y;
             std::tie(x, y) = closest_tile;
-            for (auto pt : world->get_path(get_pos(), WorldPoint(x * 16 + 8, y * 16 + 8))) {
-                m_commands.emplace(new MoveCommand(this, WorldPoint(pt.x, pt.y)));
+            for (auto pt : world->get_path(get_pos(),
+                                           WorldPosition(x * TILE_WIDTH + TILE_WIDTH/2,
+                                                         y * TILE_HEIGHT + TILE_HEIGHT/2))) {
+                m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
             }
         }
     }
@@ -127,7 +136,7 @@ void LifeForm::render(SDL_Renderer* renderer)
     if (!world) {
         return;
     }
-    const Rect viewport(world->get_viewport());
+    const WorldRect viewport(world->get_viewport());
 
     if (!m_visited_tiles.empty()) {
         SDL_BlendMode oldMode;
@@ -137,26 +146,29 @@ void LifeForm::render(SDL_Renderer* renderer)
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 30);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        const Rect bigger_view(viewport.enlarge(16));
+        const WorldRect bigger_view(geom::rect::enlarge(viewport, TILE_WIDTH));
         for (auto tile : m_visited_tiles) {
             int x, y;
             std::tie(x, y) = tile;
-            const Rect tile_rect(x * 16, y * 16, 16, 16);
+            const WorldRect tile_rect(x * TILE_WIDTH, y * TILE_HEIGHT,
+                                      TILE_WIDTH, TILE_HEIGHT);
             if (!tile_rect.is_inside(bigger_view)) {
                 continue;
             }
-            SDL_Rect rect(tile_rect.move(Point(-1 * viewport.x, -1 * viewport.y)).as_sdl_rect());
+            SDL_Rect rect(world->to_sdl_rect(tile_rect));
             SDL_RenderFillRect(renderer, &rect);
         }
         SDL_SetRenderDrawBlendMode(renderer, oldMode);
     }
 
-    const Rect body((int)round(m_pos_x) - 8/2, (int)round(m_pos_y) - 8/2, 8, 8);
-    if (!body.is_inside(viewport.enlarge(8))) {
+    const WorldRect body((int32_t)round(m_pos_x) - width/2,
+                         (int32_t)round(m_pos_y) - width/2,
+                         width, height);
+    if (!body.is_inside(geom::rect::enlarge(viewport, width))) {
         return;
     }
 
-    SDL_Rect rect(body.move(Point(-1 * viewport.x, -1 * viewport.y)).as_sdl_rect());
+    SDL_Rect rect(world->to_sdl_rect(body));
     SDL_SetRenderDrawColor(renderer, 255, 255, m_focused ? 0 : 255, 255);
     SDL_RenderFillRect(renderer, &rect);
 }
