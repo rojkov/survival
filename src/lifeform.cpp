@@ -3,6 +3,7 @@
 #include "world.h"
 #include "worldposition.h"
 #include "commands/move_command.h"
+#include "gameconstants.h"
 
 LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
     : m_world(world)
@@ -98,7 +99,9 @@ void LifeForm::update(uint32_t elapsed)
         } else {
             int x, y;
             std::tie(x, y) = closest_tile;
-            for (auto pt : world->get_path(get_pos(), WorldPosition(x * 16 + 8, y * 16 + 8))) {
+            for (auto pt : world->get_path(get_pos(),
+                                           WorldPosition(x * TILE_WIDTH + TILE_WIDTH/2,
+                                                         y * TILE_HEIGHT + TILE_HEIGHT/2))) {
                 m_commands.emplace(new MoveCommand(this, WorldPosition(pt.x, pt.y)));
             }
         }
@@ -138,11 +141,12 @@ void LifeForm::render(SDL_Renderer* renderer)
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 30);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        const WorldRect bigger_view(geom::rect::enlarge(viewport, 16));
+        const WorldRect bigger_view(geom::rect::enlarge(viewport, TILE_WIDTH));
         for (auto tile : m_visited_tiles) {
             int x, y;
             std::tie(x, y) = tile;
-            const WorldRect tile_rect(x * 16, y * 16, 16, 16);
+            const WorldRect tile_rect(x * TILE_WIDTH, y * TILE_HEIGHT,
+                                      TILE_WIDTH, TILE_HEIGHT);
             if (!tile_rect.is_inside(bigger_view)) {
                 continue;
             }

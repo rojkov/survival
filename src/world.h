@@ -5,9 +5,7 @@
 #include "worldpoint.h"
 #include "worldrect.h"
 #include "graphalg/gridgraph.h"
-
-#define WORLD_WIDTH 50
-#define WORLD_HEIGHT 50
+#include "gameconstants.h"
 
 class Viewport;
 class Terrain;
