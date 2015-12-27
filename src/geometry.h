@@ -16,8 +16,6 @@ struct BasePoint {
     T abs() const { return std::sqrt(x * x + y * y); };
 };
 
-using Point = BasePoint<int>;
-
 template<typename T, typename Vector_T>
 struct BaseRect {
     T x, y, width, height;
@@ -55,21 +53,6 @@ struct BaseRect {
 
         return sdlrect;
     };
-};
-
-struct Rect {
-    int x, y, width, height;
-
-    Rect(const int a_x, const int a_y, int a_width, int a_height) : x(a_x), y(a_y), width(a_width), height(a_height) {};
-
-    bool is_inside(const Rect &rect) const;
-    bool contains(const Point &point) const;
-    Rect get_relative_intersection(const Rect &rect) const;
-    SDL_Rect as_sdl_rect() const;
-
-    const Rect move(const Point &delta) const;
-    const Rect move_inside(const Rect &big_rect) const;
-    const Rect enlarge(const int &padding) const;
 };
 
 namespace geom {

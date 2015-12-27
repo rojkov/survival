@@ -37,7 +37,6 @@
                 'src/tile.h',
                 'src/viewport.cpp',
                 'src/viewport.h',
-                'src/geometry.cpp',
                 'src/geometry.h',
                 'src/worldposition.h',
                 'src/worldposition.cpp',
@@ -70,7 +69,6 @@
             'type': 'executable',
             'sources': [
                 'tests/tst_geometry/tst_geometry.cpp',
-                'src/geometry.cpp',
                 'src/geometry.h',
                 'src/worldposition.h',
                 'src/worldposition.cpp',

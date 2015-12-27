@@ -25,7 +25,7 @@ TEST(VectorGeomtryTest, ScaleVector) {
 }
 
 TEST(VectorGeomtryTest, GetAbsVector) {
-    Point p(4, 7);
+    BasePoint<int32_t>  p(4, 7);
     EXPECT_EQ(8, p.abs());
 }
 
