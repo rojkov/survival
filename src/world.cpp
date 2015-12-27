@@ -220,8 +220,7 @@ void World::refresh_texture()
 
     m_txt_rect = geom::rect::move_inside(
                      geom::rect::move_by(
-                         geom::rect::enlarge(
-                             viewport, padding),
+                         geom::rect::enlarge(viewport, padding),
                          WorldPoint(-1 * (viewport.x % TILE_WIDTH),
                                     -1 * (viewport.y % TILE_HEIGHT))),
                      WorldRect(0, 0,
