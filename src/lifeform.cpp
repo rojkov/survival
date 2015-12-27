@@ -5,6 +5,9 @@
 #include "commands/move_command.h"
 #include "gameconstants.h"
 
+const uint32_t LifeForm::width = 8;
+const uint32_t LifeForm::height = 8;
+
 LifeForm::LifeForm(std::weak_ptr<World> world, double pos_x, double pos_y)
     : m_world(world)
     , m_pos_x(pos_x)
@@ -63,7 +66,9 @@ void LifeForm::handle_event(const SDL_Event &event)
         if (event.button.button == SDL_BUTTON_LEFT) {
             const WorldRect viewport(world->get_viewport());
             WorldPosition pos = get_pos();
-            WorldRect rect((int32_t)round(pos.x) - 8/2, (int32_t)round(pos.y) - 8/2, 8, 8);
+            WorldRect rect((int32_t)round(pos.x) - width/2,
+                           (int32_t)round(pos.y) - height/2,
+                           width, height);
             if (rect.contains(WorldPoint(event.button.x + viewport.x, event.button.y + viewport.y))) {
                 set_focused(true);
             } else {
@@ -156,8 +161,10 @@ void LifeForm::render(SDL_Renderer* renderer)
         SDL_SetRenderDrawBlendMode(renderer, oldMode);
     }
 
-    const WorldRect body((int32_t)round(m_pos_x) - 8/2, (int32_t)round(m_pos_y) - 8/2, 8, 8);
-    if (!body.is_inside(geom::rect::enlarge(viewport, 8))) {
+    const WorldRect body((int32_t)round(m_pos_x) - width/2,
+                         (int32_t)round(m_pos_y) - width/2,
+                         width, height);
+    if (!body.is_inside(geom::rect::enlarge(viewport, width))) {
         return;
     }
 

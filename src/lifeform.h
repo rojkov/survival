@@ -27,6 +27,9 @@ public:
     void update(uint32_t elapsed);
     void render(SDL_Renderer* renderer);
 
+    static const uint32_t width;
+    static const uint32_t height;
+
 private:
     std::weak_ptr<World> m_world;
     double m_pos_x;

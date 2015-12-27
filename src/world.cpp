@@ -266,39 +266,38 @@ std::vector<WorldPoint> World::as_world_path(const std::vector<GridLocation> &pa
         std::tie(pos_x, pos_y) = *iter;
         if (pos_y == current_y && pos_x > current_x && dir != 1) {
             if (dir == 2) {
-                // 8 - width of lifeform
-                result.emplace_back(pos_x * TILE_WIDTH - 8/2,
-                                    pos_y * TILE_HEIGHT + 8/2);
+                result.emplace_back(pos_x * TILE_WIDTH - LifeForm::width/2,
+                                    pos_y * TILE_HEIGHT + LifeForm::height/2);
             } else if (dir == 4) {
-                result.emplace_back((current_x + 1)* TILE_WIDTH - 8/2,
-                                    (pos_y + 1) * TILE_HEIGHT - 8/2);
+                result.emplace_back((current_x + 1)* TILE_WIDTH - LifeForm::width/2,
+                                    (pos_y + 1) * TILE_HEIGHT - LifeForm::height/2);
             }
             dir = 1;
         } else if (pos_x == current_x && pos_y > current_y && dir != 2) {
             if (dir == 1) {
-                result.emplace_back(pos_x * TILE_WIDTH + 8/2,
-                                    pos_y * TILE_HEIGHT - 8/2);
+                result.emplace_back(pos_x * TILE_WIDTH + LifeForm::width/2,
+                                    pos_y * TILE_HEIGHT - LifeForm::height/2);
             } else if (dir == 3) {
-                result.emplace_back((pos_x + 1) * TILE_WIDTH - 8/2,
-                                    pos_y * TILE_HEIGHT - 8/2);
+                result.emplace_back((pos_x + 1) * TILE_WIDTH - LifeForm::width/2,
+                                    pos_y * TILE_HEIGHT - LifeForm::height/2);
             }
             dir = 2;
         } else if (pos_y == current_y && pos_x < current_x && dir != 3) {
             if (dir == 2) {
-                result.emplace_back(current_x * TILE_WIDTH + 8/2,
-                                    pos_y * TILE_HEIGHT + 8/2);
+                result.emplace_back(current_x * TILE_WIDTH + LifeForm::width/2,
+                                    pos_y * TILE_HEIGHT + LifeForm::height/2);
             } else if (dir == 4) {
-                result.emplace_back(current_x * TILE_WIDTH + 8/2,
-                                    (pos_y + 1) * TILE_HEIGHT - 8/2);
+                result.emplace_back(current_x * TILE_WIDTH + LifeForm::width/2,
+                                    (pos_y + 1) * TILE_HEIGHT - LifeForm::height/2);
             }
             dir = 3;
         } else if (pos_x == current_x && pos_y < current_y && dir != 4) {
             if (dir == 1) {
-                result.emplace_back(pos_x * TILE_WIDTH + 8/2,
-                                    current_y * TILE_HEIGHT + 8/2);
+                result.emplace_back(pos_x * TILE_WIDTH + LifeForm::width/2,
+                                    current_y * TILE_HEIGHT + LifeForm::height/2);
             } else if (dir == 3) {
-                result.emplace_back((pos_x + 1) * TILE_WIDTH - 8/2,
-                                    current_y * TILE_HEIGHT + 8/2);
+                result.emplace_back((pos_x + 1) * TILE_WIDTH - LifeForm::width/2,
+                                    current_y * TILE_HEIGHT + LifeForm::height/2);
             }
             dir = 4;
         } else {
