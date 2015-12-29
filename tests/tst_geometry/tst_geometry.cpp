@@ -56,6 +56,14 @@ TEST(BaseRectTest, relative_intersection) {
     EXPECT_EQ(1, newRect.y);
     EXPECT_EQ(9, newRect.width);
     EXPECT_EQ(28, newRect.height);
+
+    BaseRect<int32_t, BasePoint<int32_t>> rect3(5, 6, 18, 28);
+    BaseRect<int32_t, BasePoint<int32_t>> rect4(6, 3, 23, 35);
+    newRect = geom::rect::relative_intersection(rect3, rect4);
+    EXPECT_EQ(1, newRect.x);
+    EXPECT_EQ(0, newRect.y);
+    EXPECT_EQ(18, newRect.width);
+    EXPECT_EQ(28, newRect.height);
 }
 
 TEST(BaseRectTest, move) {
